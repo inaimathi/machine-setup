@@ -17,7 +17,7 @@ curl https://nixos.org/nix/install | sh
 . /home/inaimathi/.nix-profile/etc/profile.d/nix.sh
 
 echo "Setting up basics..."
-nix-env -i dmenu alsa-utils htop emacs-24.5 git firefox mplayer feh
+nix-env -i dmenu alsa-utils htop emacs-24.5 git firefox mplayer feh gnumake python3.4-youtube-dl
 
 echo "Setting up Lisp..."
 nix-env -i sbcl
@@ -46,7 +46,6 @@ cp xmonad.hs ~/.xmonad/
 echo "Setting up shell-ui..."
 cd ~/projects
 git clone git@github.com:Inaimathi/shell-ui.git
-cd ~/
 
 cp ~/projects/shell-ui/python/* ~/bin/
 
