@@ -30,6 +30,9 @@ nix-env -f "<nixpkgs>" -iA haskellPackages.stack
 echo "Setting up OCaml..."
 nix-env -i ocaml opam
 
+echo "Setting up Python..."
+pip install --user requests cssselect
+
 echo "Setting up Emacs..."
 mkdir ~/.emacs.d
 cp dot-emacs ~/.emacs
