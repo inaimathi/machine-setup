@@ -75,13 +75,6 @@
 (hooks (slime common-lisp emacs-lisp lisp python haskell)
        (lambda () (auto-complete-mode t)))
 
-;; org mode hooks
-(hooks org
-       (lambda ()
-	 (local-set-key (kbd "C-c t") 'org-todo)
-	 (local-set-key (kbd "<C-tab>") 'other-window)))
-(by-ext "org" org-mode)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; RSS-related
 (setq elfeed-feeds
       '(("http://blog.inaimathi.ca/feed/atom" blog)
@@ -108,11 +101,6 @@
 	))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; language/markup modes
-(autoload 'r3-mode "r3-mode.el" "Major mode for REBOL3 development" t)
-(by-ext "r" r3-mode)
-
-(autoload 'daimio-mode "daimio-mode.el" "Major mode for Daimio development" t)`
-(by-ext "dm" daimio-mode)
 
 ;;;;;;;;;; Markdown
 (autoload 'markdown-mode "markdown-mode.el" "Major mode for editing Markdown files" t)
@@ -122,46 +110,19 @@
 	 (keys (current-local-map)
 	       "<tab>" 'yas/expand)))
 
-;; (modify-syntax-entry ?` "\"" markdown-mode-syntax-table)
-;; (modify-syntax-entry ?\" "\"" markdown-mode-syntax-table)
-;; (modify-syntax-entry ?* "\"" markdown-mode-syntax-table)
-
 (by-ext ("md" "text") markdown-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;; Python
-;; (defun python-reinstate-current-directory ()
-;;   "When running Python, add the current directory ('') to the head of sys.path.
-;; For reasons unexplained, run-python passes arguments to the
-;; interpreter that explicitly remove '' from sys.path. This means
-;; that, for example, using `python-send-buffer' in a buffer
-;; visiting a module's code will fail to find other modules in the
-;; same directory.
-
-;; Adding this function to `inferior-python-mode-hook' reinstates
-;; the current directory in Python's search path."
-;;   (python-send-string "sys.path[0:0] = ['']"))
-
-;; (hooks inferior-python 'python-reinstate-current-directory)
-
 (hooks python
        (lambda ()
 	 (setq autopair-handle-action-fns
 	       (list #'autopair-default-handle-action
 		     #'autopair-python-triple-quote-action))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;; Elm
-;;; TODO get MMM working here instead of two-mode-mode
-;; (require 'two-mode-mode)
-;; (setq default-mode (list "Haskell" 'haskell-mode)
-   ;;   second-modes (list (list "Markdown" "\[markdown|" "|\]" 'markdown-mode)))
-
+;;;;;;;;;; SML
 (require 'sml-mode)
 (by-ext ("ml" "sml") sml-mode)
-
-(by-ext "elm" haskell-mode)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;; Pure
 (require 'pure-mode)
@@ -170,10 +131,6 @@
 (hooks pure-eval 'turn-on-font-lock)
 
 ;;;;;;;;;; Lisp
-(by-ext ("core" "exp") clojure-mode)
-
-(hooks clojure-mode #'cider-mode)
-
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
 (slime-setup '(slime-fancy))
 
@@ -201,14 +158,6 @@
 	 (keys (current-local-map)
 	       "C-c RET" 'macroexpand-point
 	       "C-c C-c" 'eval-defun)))
-
-(hooks clojure
-       (lambda ()
-	 (keys (current-local-map)
-	       "C-)" 'paredit-forward-slurp-sexp
-	       "C-(" 'paredit-backward-slurp-sexp
-	       "C-}" 'paredit-forward-barf-sexp
-	       "C-{" 'paredit-backward-barf-sexp)))
 
 (by-ext ("ss" "scm" "rkt") scheme-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
