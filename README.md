@@ -13,6 +13,8 @@ If you're future me,
 
 You should then be able to do all the cool things you want to do with no hassle.
 
+If you're not me ... probably best not to. This script is optimized to my idiosyncratic machine setup (and actually assumes a particular piece of hardware at the moment too). The result will be a system set up to run under Xmonad with no window manager, minimal external volume automation, and an emacs-like set of keystrokes for piloting. You'll want to tear most of it out and replace it with something similarly useful to you.
+
 ## Rationale
 
 - `x-window-system` and `xmonad` are installed from the Debian repos because there doesn't seem to be an equivalent in `nix`

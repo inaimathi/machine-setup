@@ -17,7 +17,7 @@ curl https://nixos.org/nix/install | sh
 . /home/inaimathi/.nix-profile/etc/profile.d/nix.sh
 
 echo "Setting up basics..."
-nix-env -i dmenu alsa-utils htop emacs-24.5 git firefox mplayer feh gnumake python3.4-youtube-dl
+nix-env -i dmenu alsa-utils htop emacs-24.5 git firefox mplayer feh gnumake python3.4-youtube-dl screen
 
 echo "Setting up Lisp..."
 nix-env -i sbcl
