@@ -1,5 +1,5 @@
 ;; Requiring convenience early 'cause I like having sugar to deal with load path.
-(add-to-list 'load-path "~/projects/emacs-utils")
+(add-to-list 'load-path "~/.emacs.d")
 (require 'convenience)
 
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
@@ -123,12 +123,6 @@
 ;;;;;;;;;; SML
 (require 'sml-mode)
 (by-ext ("ml" "sml") sml-mode)
-
-;;;;;;;;;; Pure
-(require 'pure-mode)
-(by-ext ("pure" "purerc") pure-mode)
-(hooks pure 'turn-on-font-lock)
-(hooks pure-eval 'turn-on-font-lock)
 
 ;;;;;;;;;; Lisp
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
