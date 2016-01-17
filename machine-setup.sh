@@ -28,7 +28,11 @@ emacs --batch setup.el
 
 ## Basic filesystem/convenience stuff
 mkdir -p ~/pictures/backgrounds
+mkdir -p ~/.xmonad
 mkdir ~/pictures/screenshots ~/projects ~/downloads ~/books ~/videos ~/bin
+
+cp xmonad.hs ~/.xmonad/
+cp dot-emacs ~/.emacs
 
 cd ~/projects
 git clone git@github.com:Inaimathi/shell-ui.git

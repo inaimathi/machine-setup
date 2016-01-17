@@ -1,0 +1,286 @@
+;; Requiring convenience early 'cause I like having sugar to deal with load path.
+(add-to-list 'load-path "~/projects/emacs-utils")
+(require 'convenience)
+
+(setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
+(setq haskell-program-name "ghci-7.8.4")
+(setq python-shell-interpreter "python")
+(add-to-load-path (list "~/.emacs.d"))
+(add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
+(add-to-load-path (list "~/projects/daimio-mode"))
+
+(require 'package)
+(setq package-archives
+      '(("melpa" . "http://melpa.milkbox.net/packages/")
+	("marmalade" . "http://marmalade-repo.org/packages/")
+	("elpa" . "http://elpa.gnu.org/packages/")))
+
+;; cosmetics
+(setq scroll-bar-mode-explicit t)
+(set-scroll-bar-mode `right)
+
+(add-hook 'git-commit-mode-hook
+	  '(lambda ()
+	     (auto-fill-mode 0))
+	  t)
+
+;; custom modeline
+(setq-default
+ mode-line-format
+ (list " " 'mode-line-modified			;; the "**" at the beginning
+       "--" 'mode-line-buffer-identification	;; buffer file name
+       "--" 'mode-line-modes			;; major and minor modes in effect
+       'mode-line-position			;; line, column, file %
+       "--" '(:eval (battery-status))
+       "--" '(:eval (temperature))
+       "--" '(:eval (format-time-string "%I:%M" (current-time)))
+       "-%-"))					;; dashes sufficient to fill rest of modeline.
+
+(defun battery-status ()
+  "Outputs the battery percentage from acpi."
+  (replace-regexp-in-string
+   ".*?\\([0-9]+\\)%.*" " Battery: \\1%% "
+   (substring (shell-command-to-string "acpi") 0 -1)))
+
+(defun temperature ()
+  (replace-regexp-in-string
+   ".*? \\([0-9\.]+\\) .*" "Temp: \\1°C "
+   (substring (shell-command-to-string "acpi -t") 0 -1)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general utility
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(require 'aes)
+(require 'highlight-parentheses)
+(require 'yasnippet)
+(yas/global-mode 1)
+
+(require 'autopair)
+(autopair-global-mode)
+
+;; unique buffer names (for similarly named files in different directories
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'reverse
+      uniquify-separator "/"
+      uniquify-after-kill-buffer-p t ; rename after killing uniquified
+      uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+
+;; editing/general convenience addons
+(global-mode highlight-parentheses-mode)
+(global-mode column-number-mode)
+(require 'smart-tab)
+(require 'redo+)
+(require 'hideshow)
+(require 'auto-complete-config)
+(hooks (slime common-lisp emacs-lisp lisp python haskell)
+       (lambda () (auto-complete-mode t)))
+
+;; org mode hooks
+(hooks org
+       (lambda ()
+	 (local-set-key (kbd "C-c t") 'org-todo)
+	 (local-set-key (kbd "<C-tab>") 'other-window)))
+(by-ext "org" org-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; RSS-related
+(setq elfeed-feeds
+      '(("http://blog.inaimathi.ca/feed/atom" blog)
+	("http://www.antipope.org/charlie/blog-static/atom.xml" blog)
+	("http://existentialtype.wordpress.com/feed/" blog)
+	("http://vile-jelly-blog.tumblr.com/rss" blog)
+
+	("http://feeds.feedburner.com/RahdoTalksThrough" boardgames)
+	("https://www.youtube.com/feeds/videos.xml?user=rahdo" boardgames)
+	("http://kicktracker.inaimathi.ca/board-games" boardgames)
+
+	("http://what-if.xkcd.com/feed.atom" comic)
+	("http://xkcd.com/rss.xml" comic)
+	("http://www.rsspect.com/rss/qwantz.xml" comic)
+	("http://www.marycagle.com/rss.php" comic)
+	("http://www.lutherlevy.com/?feed=rss2" comic)
+	("http://killsixbilliondemons.com/feed/" comic)
+	("http://www.threepanelsoul.com/rss.php" comic)
+	("http://www.smbc-comics.com/rss.php" comic)
+	("http://www.erfworld.com/erf_stream/view?view=rss" comic)
+
+	;; ("http://stackexchange.com/feeds/tagsets/43442/inaimathi-lang-digests?sort=active" stack)
+	;; ("http://stackexchange.com/feeds/tagsets/211649/inaimathi-js-digest?sort=newest" stack)
+	))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; language/markup modes
+(autoload 'r3-mode "r3-mode.el" "Major mode for REBOL3 development" t)
+(by-ext "r" r3-mode)
+
+(autoload 'daimio-mode "daimio-mode.el" "Major mode for Daimio development" t)`
+(by-ext "dm" daimio-mode)
+
+;;;;;;;;;; Markdown
+(autoload 'markdown-mode "markdown-mode.el" "Major mode for editing Markdown files" t)
+(hooks markdown
+       (lambda ()
+	 ;; Fuck you, Markdown mode, you don't get to re-bind tab
+	 (keys (current-local-map)
+	       "<tab>" 'yas/expand)))
+
+;; (modify-syntax-entry ?` "\"" markdown-mode-syntax-table)
+;; (modify-syntax-entry ?\" "\"" markdown-mode-syntax-table)
+;; (modify-syntax-entry ?* "\"" markdown-mode-syntax-table)
+
+(by-ext ("md" "text") markdown-mode)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;; Python
+;; (defun python-reinstate-current-directory ()
+;;   "When running Python, add the current directory ('') to the head of sys.path.
+;; For reasons unexplained, run-python passes arguments to the
+;; interpreter that explicitly remove '' from sys.path. This means
+;; that, for example, using `python-send-buffer' in a buffer
+;; visiting a module's code will fail to find other modules in the
+;; same directory.
+
+;; Adding this function to `inferior-python-mode-hook' reinstates
+;; the current directory in Python's search path."
+;;   (python-send-string "sys.path[0:0] = ['']"))
+
+;; (hooks inferior-python 'python-reinstate-current-directory)
+
+(hooks python
+       (lambda ()
+	 (setq autopair-handle-action-fns
+	       (list #'autopair-default-handle-action
+		     #'autopair-python-triple-quote-action))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;; Elm
+;;; TODO get MMM working here instead of two-mode-mode
+;; (require 'two-mode-mode)
+;; (setq default-mode (list "Haskell" 'haskell-mode)
+   ;;   second-modes (list (list "Markdown" "\[markdown|" "|\]" 'markdown-mode)))
+
+(require 'sml-mode)
+(by-ext ("ml" "sml") sml-mode)
+
+(by-ext "elm" haskell-mode)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;; Pure
+(require 'pure-mode)
+(by-ext ("pure" "purerc") pure-mode)
+(hooks pure 'turn-on-font-lock)
+(hooks pure-eval 'turn-on-font-lock)
+
+;;;;;;;;;; Lisp
+(by-ext ("core" "exp") clojure-mode)
+
+(hooks clojure-mode #'cider-mode)
+
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(slime-setup '(slime-fancy))
+
+(autoload 'paredit-mode "paredit"
+  "Minor mode for pseudo-structurally editing Lisp code." t)
+
+(defun custom-paredit-mode ()
+  (progn (paredit-mode +1)
+	 (define-key paredit-mode-map (kbd "<C-left>") 'backward-sexp)
+	 (define-key paredit-mode-map (kbd "<C-right>") 'forward-sexp)))
+
+(hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
+       (lambda ()
+	 (custom-paredit-mode)
+	 (setq autopair-dont-activate t)
+	 (autopair-mode -1)))
+
+(modify-syntax-entry ?\[ "($" lisp-mode-syntax-table)
+(modify-syntax-entry ?\] ")^" lisp-mode-syntax-table)
+(modify-syntax-entry ?\{ "($" lisp-mode-syntax-table)
+(modify-syntax-entry ?\} ")^" lisp-mode-syntax-table)
+
+(hooks emacs-lisp
+       (lambda ()
+	 (keys (current-local-map)
+	       "C-c RET" 'macroexpand-point
+	       "C-c C-c" 'eval-defun)))
+
+(hooks clojure
+       (lambda ()
+	 (keys (current-local-map)
+	       "C-)" 'paredit-forward-slurp-sexp
+	       "C-(" 'paredit-backward-slurp-sexp
+	       "C-}" 'paredit-forward-barf-sexp
+	       "C-{" 'paredit-backward-barf-sexp)))
+
+(by-ext ("ss" "scm" "rkt") scheme-mode)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; global key changes
+(keys (current-global-map)
+      "C-x C-m" 'execute-extended-command
+      "C-x m" 'execute-extended-command
+      "C-x C-w" 'kill-ring-save
+      "C-w" 'backward-kill-sexp
+
+      "C-x C-j" (lambda () (interactive) (other-window -1))
+      "C-x C-k" 'other-window
+
+      "<f7>" 'call-last-kbd-macro
+      "C-S-z" 'redo
+      "C-z" 'undo
+      ;; "<C-tab>" 'other-window
+      "C-s" 'isearch-forward-regexp
+      "C-r" 'isearch-backward-regexp
+      "C-M-c" 'clipboard-kill-ring-save
+      "C-x C-x" 'clipboard-kill-region
+      "C-x C-'" 'comment-or-uncomment-region
+      "C-x C-g" 'comment-or-uncomment-region
+      "C-x t" 'eshell
+      "C-x f" 'browse-url-at-point
+
+      "C-+" 'text-scale-increase
+      "C-=" 'text-scale-decrease
+
+      "C-x <C-left>" 'beginning-of-buffer
+      "C-x <left>" 'beginning-of-buffer
+      "C-x <C-right>" 'end-of-buffer
+      "C-x <right>" 'end-of-buffer
+
+      "<C-left>" 'backward-sexp
+      "<C-right>" 'forward-sexp
+      "C-f" 'forward-sexp
+      "C-b" 'backward-sexp
+      "C-M-b" 'backward-char
+      "C-M-f" 'forward-char)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(blog-default-blogger-title "language agnostic")
+ '(blog-default-blogger-user (quote leo\.zovic@gmail\.com))
+ '(haskell-mode-hook (quote (turn-on-haskell-indent (lambda nil (auto-complete-mode t)))))
+ '(haskell-program-name "cabal repl")
+ '(htmlize-output-type (quote inline-css))
+ '(inf-ruby-implementations (quote (("ruby" . "irb2.1 --prompt default --noreadline -r irb/completion") ("jruby" . "jruby -S irb --prompt default --noreadline -r irb/completion") ("rubinius" . "rbx -r irb/completion") ("yarv" . "irb1.9 -r irb/completion") ("macruby" . "macirb -r irb/completion") ("pry" . "pry"))))
+ '(iswitchb-mode t)
+ '(lpr-command "lp")
+ '(magit-process-connection-type t)
+ '(magit-revert-item-confirm nil)
+ '(menu-bar-mode nil)
+ '(org-log-done (quote note))
+ '(quack-programs (quote ("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
+ '(scheme-program-name "racket")
+ '(show-paren-mode t)
+ '(tool-bar-mode nil)
+ '(transient-mark-mode t))
+(put 'downcase-region 'disabled nil)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(git-commit-nonempty-second-line-face ((t (:inherit nil))))
+ '(git-commit-overlong-summary-face ((t (:inherit nil))))
+ '(git-commit-summary-face ((t (:inherit nil)))))
+
+(put 'upcase-region 'disabled nil)
