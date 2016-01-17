@@ -1,4 +1,5 @@
 ## Basics
+ssh-add
 su -c sh machine-root-setup.sh
 
 setxkbmap -layout us -option ctrl:nocaps
