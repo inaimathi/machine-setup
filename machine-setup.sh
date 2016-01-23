@@ -37,7 +37,7 @@ echo "Setting up Emacs..."
 mkdir -p ~/.emacs.d/mine
 cp dot-emacs ~/.emacs
 cp convenience.el ~/.emacs.d/mine/
-nix-env -i emacs-highlight-parentheses emacs-aes emacs-elfeed emacs-auto-complete emacs-yasnippet emacs-paredit emacs-markdown-mode emacs-yaml-mode emacs-smart-tab emacs-autopair emacs-haskell-mode # emacs-redo+
+nix-env -i emacs-highlight-parentheses emacs-aes emacs-elfeed emacs-auto-complete emacs-yasnippet emacs-paredit emacs-markdown-mode emacs-yaml-mode emacs-smart-tab emacs-autopair emacs-haskell-mode emacs-magit # emacs-redo+
 
 echo "Setting up Xmonad..."
 mkdir -p ~/.xmonad
