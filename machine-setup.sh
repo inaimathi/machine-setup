@@ -17,7 +17,7 @@ curl https://nixos.org/nix/install | sh
 . /home/inaimathi/.nix-profile/etc/profile.d/nix.sh
 
 echo "Setting up basics..."
-nix-env -i dmenu alsa-utils htop emacs-24.5 git firefox mplayer feh gnumake python3.4-youtube-dl screen
+nix-env -i dmenu alsa-utils htop emacs-24.5 git firefox mplayer feh gnumake python3.4-youtube-dl screen gimp inkscape
 
 echo "Setting up Lisp..."
 nix-env -i sbcl
@@ -34,17 +34,18 @@ echo "Setting up Python..."
 pip install --user requests cssselect
 
 echo "Setting up Emacs..."
-mkdir ~/.emacs.d
+mkdir -p ~/.emacs.d/mine
 cp dot-emacs ~/.emacs
-cp convenience.el ~/.emacs.d/
-emacs --batch setup.el
+cp convenience.el ~/.emacs.d/mine/
+nix-env -i emacs-highlight-parentheses emacs-aes emacs-elfeed emacs-auto-complete emacs-yasnippet emacs-paredit emacs-markdown-mode emacs-yaml-mode emacs-smart-tab emacs-autopair emacs-haskell-mode # emacs-redo+
+
+echo "Setting up Xmonad..."
+mkdir -p ~/.xmonad
+cp xmonad.hs ~/.xmonad/
 
 echo "Setting up basic filesystem structure..."
 mkdir -p ~/pictures/backgrounds
-mkdir -p ~/.xmonad
-mkdir ~/pictures/screenshots ~/projects ~/downloads ~/books ~/videos ~/bin
-
-cp xmonad.hs ~/.xmonad/
+mkdir -p ~/pictures/screenshots ~/projects ~/downloads ~/books ~/videos ~/bin
 
 echo "Setting up shell-ui..."
 cd ~/projects

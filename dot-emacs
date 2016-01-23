@@ -1,19 +1,18 @@
 ;; Requiring convenience early 'cause I like having sugar to deal with load path.
-(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "~/.emacs.d/mine")
 (require 'convenience)
 
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
 (setq python-shell-interpreter "python")
-(add-to-load-path (list "~/.emacs.d"))
-(add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
-(add-to-load-path (list "~/projects/daimio-mode"))
+(add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
+(add-to-load-path (list-subdirectories "~/.nix-profile/share/emacs/site-lisp/elpa"))
 
 (require 'package)
 (setq package-archives
       '(("melpa" . "http://melpa.milkbox.net/packages/")
-	("marmalade" . "http://marmalade-repo.org/packages/")
-	("elpa" . "http://elpa.gnu.org/packages/")))
+ 	("marmalade" . "http://marmalade-repo.org/packages/")
+ 	("elpa" . "http://elpa.gnu.org/packages/")))
 
 ;; cosmetics
 (setq scroll-bar-mode-explicit t)
@@ -50,6 +49,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general utility
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+(require 'magit)
 (require 'aes)
 (require 'highlight-parentheses)
 (require 'yasnippet)
@@ -69,13 +69,14 @@
 (global-mode highlight-parentheses-mode)
 (global-mode column-number-mode)
 (require 'smart-tab)
-(require 'redo+)
+;; (require 'redo+)
 (require 'hideshow)
 (require 'auto-complete-config)
 (hooks (slime common-lisp emacs-lisp lisp python haskell)
        (lambda () (auto-complete-mode t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; RSS-related
+(require 'elfeed)
 (setq elfeed-feeds
       '(("http://blog.inaimathi.ca/feed/atom" blog)
 	("http://www.antipope.org/charlie/blog-static/atom.xml" blog)
@@ -121,26 +122,30 @@
 		     #'autopair-python-triple-quote-action))))
 
 ;;;;;;;;;; SML
-(require 'sml-mode)
-(by-ext ("ml" "sml") sml-mode)
+; (require 'sml-mode)
+; (by-ext ("ml" "sml") sml-mode)
 
 ;;;;;;;;;; Lisp
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
 (slime-setup '(slime-fancy))
 
-(autoload 'paredit-mode "paredit"
-  "Minor mode for pseudo-structurally editing Lisp code." t)
+(autoload 'enable-paredit-mode "paredit"
+  "Turn on pseudo-structural editing of Lisp code."
+  t)
 
-(defun custom-paredit-mode ()
-  (progn (paredit-mode +1)
-	 (define-key paredit-mode-map (kbd "<C-left>") 'backward-sexp)
-	 (define-key paredit-mode-map (kbd "<C-right>") 'forward-sexp)))
+(eval-after-load 'paredit
+  '(keys paredit-mode-map
+	 "<C-left>" 'backward-sexp
+	 "<C-right>" 'forward-sexp))
+
+;; (hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
+;;        (lambda ()
+;; 	 (custom-paredit-mode)
+;; 	 (setq autopair-dont-activate t)
+;; 	 (autopair-mode -1)))
 
 (hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
-       (lambda ()
-	 (custom-paredit-mode)
-	 (setq autopair-dont-activate t)
-	 (autopair-mode -1)))
+       'enable-paredit-mode)
 
 (modify-syntax-entry ?\[ "($" lisp-mode-syntax-table)
 (modify-syntax-entry ?\] ")^" lisp-mode-syntax-table)
@@ -169,7 +174,7 @@
       "<f7>" 'call-last-kbd-macro
       "C-S-z" 'redo
       "C-z" 'undo
-      ;; "<C-tab>" 'other-window
+
       "C-s" 'isearch-forward-regexp
       "C-r" 'isearch-backward-regexp
       "C-M-c" 'clipboard-kill-ring-save
