@@ -17,6 +17,6 @@ If you're not me ... probably best not to. This script is optimized to my idiosy
 
 ## Rationale
 
-- `x-window-system` and `xmonad` are installed from the Debian repos because there doesn't seem to be an equivalent in `nix`
-- all language runtimes, editing environment programs are installed via `nix-env`
-- language-specific libraries are left up to language-specific installation utilities (`stack` for Haskell, `opam` for OCaml, `quicklisp` for Common Lisp, etc)
+- install everything you can from `nix`
+- things that don't work/aren't available from nix, install from the Debian repos
+- language-specific libraries install via language-specific build tools (`quicklisp`, `opam`, `stack`, `pip`, etc)
