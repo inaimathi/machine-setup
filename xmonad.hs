@@ -53,8 +53,11 @@ screenshotFolder = "/home/inaimathi/pictures/screenshots/"
 
 onStartup :: X ()
 onStartup = do
+  spawn "setxkbmap -layout us -option ctrl:nocaps"
   spawn "set-monitors"
-  spawn "pmount /dev/mmcblk0p1"
+  spawn "emacs"
+  spawn "firefox"
+  spawn "urxvt -e exit" -- for a feh workaround https://github.com/derf/feh/issues/162
   setDesktopBackground "edge-of-the-world.jpg"
 
 ---------- Helper Functions

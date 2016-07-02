@@ -4,6 +4,10 @@ Installation scripts to make setting up a new linux machine easier for me.
 
 Note the **me** in the above sentence. This is highly unlikely to be useful to **you**, except perhaps as a script collection to pillage chunklets of.
 
+## TODO
+
+- Removed the emacs packages from `nix`-land, since they seem to have disappeared :/ (put together a `setup.el` file, I guess)
+
 ## Usage
 
 If you're future me,
