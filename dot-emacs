@@ -5,8 +5,7 @@
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
 (setq python-shell-interpreter "python")
-(add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
-(add-to-load-path (list-subdirectories "~/.nix-profile/share/emacs/site-lisp/elpa"))
+(add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
 
 (require 'package)
 (setq package-archives
@@ -31,7 +30,6 @@
        "--" 'mode-line-modes			;; major and minor modes in effect
        'mode-line-position			;; line, column, file %
        "--" '(:eval (battery-status))
-       "--" '(:eval (temperature))
        "--" '(:eval (format-time-string "%I:%M" (current-time)))
        "-%-"))					;; dashes sufficient to fill rest of modeline.
 
@@ -41,12 +39,14 @@
    ".*?\\([0-9]+\\)%.*" " Battery: \\1%% "
    (substring (shell-command-to-string "acpi") 0 -1)))
 
-(defun temperature ()
-  (replace-regexp-in-string
-   ".*? \\([0-9\.]+\\) .*" "Temp: \\1°C "
-   (substring (shell-command-to-string "acpi -t") 0 -1)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general utility
+(defun switch-to-minibuffer ()
+  "Switch to minibuffer window."
+  (interactive)
+  (if (active-minibuffer-window)
+      (select-window (active-minibuffer-window))
+    (error "Minibuffer is not active")))
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (require 'magit)
@@ -138,11 +138,10 @@
 	 "<C-left>" 'backward-sexp
 	 "<C-right>" 'forward-sexp))
 
-;; (hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
-;;        (lambda ()
-;; 	 (custom-paredit-mode)
-;; 	 (setq autopair-dont-activate t)
-;; 	 (autopair-mode -1)))
+(hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
+       (lambda ()
+	 (setq autopair-dont-activate t)
+	 (autopair-mode -1)))
 
 (hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
        'enable-paredit-mode)
@@ -170,6 +169,7 @@
 
       "C-x C-j" (lambda () (interactive) (other-window -1))
       "C-x C-k" 'other-window
+      "C-x C-l" 'switch-to-minibuffer
 
       "<f7>" 'call-last-kbd-macro
       "C-S-z" 'redo
@@ -206,17 +206,30 @@
  ;; If there is more than one, they won't work right.
  '(blog-default-blogger-title "language agnostic")
  '(blog-default-blogger-user (quote leo\.zovic@gmail\.com))
- '(haskell-mode-hook (quote (turn-on-haskell-indent (lambda nil (auto-complete-mode t)))))
- '(haskell-program-name "cabal repl")
+ '(haskell-mode-hook
+   (quote
+    (turn-on-haskell-indent
+     (lambda nil
+       (auto-complete-mode t)))) t)
+ '(haskell-program-name "cabal repl" t)
  '(htmlize-output-type (quote inline-css))
- '(inf-ruby-implementations (quote (("ruby" . "irb2.1 --prompt default --noreadline -r irb/completion") ("jruby" . "jruby -S irb --prompt default --noreadline -r irb/completion") ("rubinius" . "rbx -r irb/completion") ("yarv" . "irb1.9 -r irb/completion") ("macruby" . "macirb -r irb/completion") ("pry" . "pry"))))
- '(iswitchb-mode t)
+ '(icomplete-mode t)
+ '(inf-ruby-implementations
+   (quote
+    (("ruby" . "irb2.1 --prompt default --noreadline -r irb/completion")
+     ("jruby" . "jruby -S irb --prompt default --noreadline -r irb/completion")
+     ("rubinius" . "rbx -r irb/completion")
+     ("yarv" . "irb1.9 -r irb/completion")
+     ("macruby" . "macirb -r irb/completion")
+     ("pry" . "pry"))))
  '(lpr-command "lp")
  '(magit-process-connection-type t)
  '(magit-revert-item-confirm nil)
  '(menu-bar-mode nil)
  '(org-log-done (quote note))
- '(quack-programs (quote ("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
+ '(quack-programs
+   (quote
+    ("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
  '(scheme-program-name "racket")
  '(show-paren-mode t)
  '(tool-bar-mode nil)
