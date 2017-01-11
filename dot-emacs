@@ -5,6 +5,7 @@
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
 (setq python-shell-interpreter "python")
+; (add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
 (add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
 
 (require 'package)
@@ -47,7 +48,12 @@
       (select-window (active-minibuffer-window))
     (error "Minibuffer is not active")))
 
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook
+ 'before-save-hook
+ (lambda (&optional start end)
+   (unless (or (string-match "howl/README.md" buffer-file-name)
+	       (string-match "\\.howl" buffer-file-name))
+     (delete-trailing-whitespace start end))))
 
 (require 'magit)
 (require 'aes)
@@ -89,17 +95,41 @@
 
 	("http://what-if.xkcd.com/feed.atom" comic)
 	("http://xkcd.com/rss.xml" comic)
-	("http://www.rsspect.com/rss/qwantz.xml" comic)
-	("http://www.marycagle.com/rss.php" comic)
+	("http://www.marycagle.com/rss.php" rare-comic)
 	("http://www.lutherlevy.com/?feed=rss2" comic)
 	("http://killsixbilliondemons.com/feed/" comic)
-	("http://www.threepanelsoul.com/rss.php" comic)
+	("http://www.threepanelsoul.com/rss.php" rare-comic)
 	("http://www.smbc-comics.com/rss.php" comic)
-	("http://www.erfworld.com/erf_stream/view?view=rss" comic)
+	("http://feeds.feedburner.com/CartesianClosedComic" rare-comic)
 
 	;; ("http://stackexchange.com/feeds/tagsets/43442/inaimathi-lang-digests?sort=active" stack)
 	;; ("http://stackexchange.com/feeds/tagsets/211649/inaimathi-js-digest?sort=newest" stack)
 	))
+
+(defun elfeed-search-copy-all ()
+  (interactive)
+  (save-excursion
+    (beginning-of-buffer)
+    (let ((links nil)
+	  (cur (elfeed-search-selected :ignore-region)))
+      (while cur
+	(when (elfeed-tagged-p 'unread cur)
+	  (push (elfeed-entry-link cur) links)
+	  (elfeed-untag cur 'unread)
+	  (elfeed-search-update-line))
+	(forward-line)
+	(setf cur (elfeed-search-selected :ignore-region)))
+      (let ((res (mapconcat 'identity (reverse links) " ")))
+	(kill-new res)
+	(if (fboundp 'gui-set-selection)
+	    (gui-set-selection elfeed-search-clipboard-type res)
+	  (with-no-warnings
+	    (x-set-selection elfeed-search-clipboard-type res)))))))
+
+(hooks elfeed-search
+       (lambda ()
+	 (keys (current-local-map)
+	       "Y" 'elfeed-search-copy-all)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; language/markup modes
 
@@ -120,6 +150,7 @@
 	 (setq autopair-handle-action-fns
 	       (list #'autopair-default-handle-action
 		     #'autopair-python-triple-quote-action))))
+(hooks python 'jedi-mode)
 
 ;;;;;;;;;; SML
 ; (require 'sml-mode)
