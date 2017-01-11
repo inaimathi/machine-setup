@@ -54,3 +54,4 @@ cp ~/projects/shell-ui/python/* ~/bin/
 
 git config --global user.email "leo.zovic@gmail.com"
 git config --global user.name "inaimathi"
+git config --global pull.rebase true
