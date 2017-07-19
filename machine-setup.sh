@@ -1,4 +1,3 @@
-## Basics
 dumpkeys | head -1 > /home/inaimathi/caps2ctrl.map
 echo 'keycode 58 = Control' >> /home/inaimathi/caps2ctrl.map
 
@@ -17,7 +16,7 @@ curl https://nixos.org/nix/install | sh
 . /home/inaimathi/.nix-profile/etc/profile.d/nix.sh
 
 echo "Setting up basics..."
-nix-env -i dmenu rsync htop emacs-24.5 git firefox mplayer feh gnumake screen gimp inkscape youtube-dl rxvt-unicode
+nix-env -i dmenu rsync htop emacs-25.2 git firefox mplayer feh gnumake screen gimp inkscape youtube-dl
 
 echo "Setting up Lisp..."
 nix-env -i sbcl
@@ -35,6 +34,7 @@ pip install --user requests cssselect
 
 echo "Setting up Emacs..."
 mkdir -p ~/.emacs.d/mine
+## emacs --script setup.el
 cp dot-emacs ~/.emacs
 cp convenience.el ~/.emacs.d/mine/
 
