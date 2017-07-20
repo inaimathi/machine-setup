@@ -1,18 +1,12 @@
 ;; Requiring convenience early 'cause I like having sugar to deal with load path.
 (add-to-list 'load-path "~/.emacs.d/mine")
 (require 'convenience)
+(require 'packs)
 
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
 (setq python-shell-interpreter "python")
 ; (add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
-(add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
-
-(require 'package)
-(setq package-archives
-      '(("melpa" . "http://melpa.milkbox.net/packages/")
- 	("marmalade" . "http://marmalade-repo.org/packages/")
- 	("elpa" . "http://elpa.gnu.org/packages/")))
 
 ;; cosmetics
 (setq scroll-bar-mode-explicit t)

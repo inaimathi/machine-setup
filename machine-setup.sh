@@ -34,9 +34,8 @@ pip install --user requests cssselect
 
 echo "Setting up Emacs..."
 mkdir -p ~/.emacs.d/mine
-## emacs --script setup.el
 cp dot-emacs ~/.emacs
-cp convenience.el ~/.emacs.d/mine/
+cp convenience.el packs.el ~/.emacs.d/mine/
 
 echo "Setting up Xmonad..."
 mkdir -p ~/.xmonad
