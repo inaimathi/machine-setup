@@ -12,7 +12,7 @@
     aes
     magit highlight-parentheses autopair smart-tab
     auto-complete yasnippet paredit
-    markdown-mode haskell-mode))
+    markdown-mode haskell-mode clojure-mode cider))
 
 (unless (every #'package-installed-p +package-list+)
   (package-initialize)
