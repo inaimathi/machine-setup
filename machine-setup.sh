@@ -37,19 +37,20 @@ mkdir -p ~/.emacs.d/mine
 cp dot-emacs ~/.emacs
 cp convenience.el packs.el ~/.emacs.d/mine/
 
-echo "Setting up Xmonad..."
-mkdir -p ~/.xmonad
-cp xmonad.hs ~/.xmonad/
+echo "Setting up stumpwm..."
+cp stumpwmrc ~/.stumpwmrc
 
 echo "Setting up basic filesystem structure..."
 mkdir -p ~/pictures/backgrounds
 mkdir -p ~/pictures/screenshots ~/projects ~/downloads ~/books ~/videos ~/bin
+mkdir ~/projects
 
 echo "Setting up shell-ui..."
 cd ~/projects
 git clone git@github.com:Inaimathi/shell-ui.git
 
 cp ~/projects/shell-ui/python/* ~/bin/
+cp ~/projects/shell-ui/sh/* ~/bin/
 
 git config --global user.email "leo.zovic@gmail.com"
 git config --global user.name "inaimathi"

@@ -2,6 +2,8 @@
 
 (add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
 
+(package-initialize)
+
 (setq package-archives
       '(("melpa" . "http://melpa.milkbox.net/packages/")
  	("marmalade" . "http://marmalade-repo.org/packages/")
@@ -15,7 +17,6 @@
     markdown-mode haskell-mode clojure-mode cider))
 
 (unless (every #'package-installed-p +package-list+)
-  (package-initialize)
 
   (unless package-archive-contents
     (package-refresh-contents))
