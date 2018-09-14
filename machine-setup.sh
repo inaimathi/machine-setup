@@ -30,7 +30,7 @@ echo "Setting up OCaml..."
 nix-env -i ocaml opam
 
 echo "Setting up Python..."
-pip install --user requests cssselect
+pip install --user requests cssselect flake8 pylint pyflakes
 
 echo "Setting up Emacs..."
 mkdir -p ~/.emacs.d/mine

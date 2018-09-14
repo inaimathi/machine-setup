@@ -5,7 +5,6 @@
 
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
-(setq python-shell-interpreter "python")
 ; (add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
 
 ;; cosmetics
@@ -139,12 +138,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;; Python
+(require 'flymake-python-pyflakes)
+(setq
+ flymake-python-pyflakes-executable "flake8"
+ python-shell-interpreter "python")
 (hooks python
        (lambda ()
 	 (setq autopair-handle-action-fns
 	       (list #'autopair-default-handle-action
-		     #'autopair-python-triple-quote-action))))
-(hooks python 'jedi-mode)
+		     #'autopair-python-triple-quote-action))
+	 (keys (current-local-map)
+	       "C-," 'flymake-goto-next-error
+	       "C-." 'flymake-goto-prev-error)))
+(hooks python 'flymake-python-pyflakes-load)
+;; (hooks python 'jedi-mode)
 
 ;;;;;;;;;; SML
 ; (require 'sml-mode)
