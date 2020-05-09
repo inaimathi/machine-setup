@@ -15,7 +15,7 @@
     magit highlight-parentheses autopair smart-tab
     auto-complete yasnippet paredit
     markdown-mode haskell-mode clojure-mode cider
-    flymake-python-pyflakes))
+    py-isort flymake-python-pyflakes))
 
 (unless (every #'package-installed-p +package-list+)
 
