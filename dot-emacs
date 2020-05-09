@@ -44,9 +44,10 @@
 (add-hook
  'before-save-hook
  (lambda (&optional start end)
-   (unless (or (string-match "howl/README.md" buffer-file-name)
-	       (string-match "\\.howl" buffer-file-name))
-     (delete-trailing-whitespace start end))))
+   (delete-trailing-whitespace start end)
+   (when (string-match "\\.py" buffer-file-name)
+     (unless (string-match "api.py" buffer-file-name)
+       (py-isort-before-save)))))
 
 (require 'magit)
 (require 'aes)
@@ -147,11 +148,11 @@
 	 (setq autopair-handle-action-fns
 	       (list #'autopair-default-handle-action
 		     #'autopair-python-triple-quote-action))
+	 (python-black-on-save-mode)
 	 (keys (current-local-map)
 	       "C-," 'flymake-goto-next-error
 	       "C-." 'flymake-goto-prev-error)))
 (hooks python 'flymake-python-pyflakes-load)
-;; (hooks python 'jedi-mode)
 
 ;;;;;;;;;; SML
 ; (require 'sml-mode)
@@ -259,6 +260,9 @@
  '(magit-revert-item-confirm nil)
  '(menu-bar-mode nil)
  '(org-log-done (quote note))
+ '(package-selected-packages
+   (quote
+    (sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode py-isort flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab autopair highlight-parentheses magit aes elfeed)))
  '(quack-programs
    (quote
     ("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
