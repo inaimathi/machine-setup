@@ -1,4 +1,5 @@
 (require 'cl)
+(require 'color)
 
 ;;; lisp basics
 (defun flash-region (start end &optional timeout)
@@ -109,5 +110,39 @@
     (replace-regexp-in-string
      "part[ 	]\\([0-9]+\\)" "p\\1"
      (downcase a-string)))))
+
+(defun hex->rgb (hex-string)
+  (mapcar
+   (lambda (h)
+     (/ (float (string-to-number h 16)) (float 255)))
+   (list
+    (substring hex-string 1 3)
+    (substring hex-string 3 5)
+    (substring hex-string 5))))
+
+(defmacro if-let (name test then &optional else)
+  (let ((tmp (gensym)))
+    `(let ((,tmp ,test))
+       (if ,tmp
+	   (let ((,name ,tmp)) ,then)
+	 ,else))))
+
+(defun virtual-env-name ()
+  (if-let venv (getenv "VIRTUAL_ENV")
+    (file-name-nondirectory venv)))
+
+(defun color-of (input)
+  (concat "#" (substring (secure-hash 'md5 input) 0 6)))
+
+(defun set-colors-by (input)
+  (when input
+    (let* ((color (color-of input))
+	   (lightness (third (apply #'color-rgb-to-hsl (hex->rgb (color-of input))))))
+      (set-background-color color)
+      (set-foreground-color
+       (if (>= lightness 0.5) "white" "black"))
+
+      (list color lightness))))
+
 
 (provide 'convenience)

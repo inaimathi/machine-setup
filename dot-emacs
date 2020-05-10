@@ -3,6 +3,8 @@
 (require 'convenience)
 (require 'packs)
 
+(set-colors-by (virtual-env-name))
+
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
 ; (add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
@@ -44,6 +46,10 @@
 (add-hook
  'before-save-hook
  (lambda (&optional start end)
+   ;; (unless (or (string-match "howl/README.md" buffer-file-name)
+   ;; 	       (string-match "\\.howl" buffer-file-name))
+   ;; (delete-trailing-whitespace start end)
+   ;;   )
    (delete-trailing-whitespace start end)
    (when (string-match "\\.py" buffer-file-name)
      (unless (string-match "api.py" buffer-file-name)
@@ -237,8 +243,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
  '(blog-default-blogger-title "language agnostic")
  '(blog-default-blogger-user (quote leo\.zovic@gmail\.com))
+ '(custom-enabled-themes (quote (deeper-blue)))
  '(haskell-mode-hook
    (quote
     (turn-on-haskell-indent
