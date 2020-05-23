@@ -3,8 +3,6 @@
 (require 'convenience)
 (require 'packs)
 
-(set-colors-by (virtual-env-name))
-
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
 ; (add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
@@ -157,8 +155,8 @@
 	 (python-black-on-save-mode)
 	 (keys (current-local-map)
 	       "C-," 'flymake-goto-next-error
-	       "C-." 'flymake-goto-prev-error)))
-(hooks python 'flymake-python-pyflakes-load)
+	       "C-." 'flymake-goto-prev-error))
+       'flymake-python-pyflakes-load)
 
 ;;;;;;;;;; SML
 ; (require 'sml-mode)
@@ -175,20 +173,16 @@
 (eval-after-load 'paredit
   '(keys paredit-mode-map
 	 "<C-left>" 'backward-sexp
-	 "<C-right>" 'forward-sexp))
+	 "<C-right>" 'forward-sexp
+	 "{" 'paredit-open-curly
+	 "}" 'paredit-close-curly))
 
-(hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
+(hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure slime-repl)
        (lambda ()
 	 (setq autopair-dont-activate t)
-	 (autopair-mode -1)))
-
-(hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure)
-       'enable-paredit-mode)
-
-(modify-syntax-entry ?\[ "($" lisp-mode-syntax-table)
-(modify-syntax-entry ?\] ")^" lisp-mode-syntax-table)
-(modify-syntax-entry ?\{ "($" lisp-mode-syntax-table)
-(modify-syntax-entry ?\} ")^" lisp-mode-syntax-table)
+	 (autopair-mode -1))
+       'enable-paredit-mode
+       (lambda () (set-syntax-table (set-syntax-table clojure-mode-syntax-table))))
 
 (hooks emacs-lisp
        (lambda ()
@@ -249,7 +243,7 @@
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
  '(blog-default-blogger-title "language agnostic")
  '(blog-default-blogger-user (quote leo\.zovic@gmail\.com))
- '(custom-enabled-themes (quote (deeper-blue)))
+ '(custom-enabled-themes (quote (whiteboard)))
  '(haskell-mode-hook
    (quote
     (turn-on-haskell-indent
@@ -292,3 +286,5 @@
  '(git-commit-summary-face ((t (:inherit nil)))))
 
 (put 'upcase-region 'disabled nil)
+
+(set-colors-by (virtual-env-name))

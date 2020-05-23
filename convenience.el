@@ -58,15 +58,27 @@
 	     collect `(define-key map (kbd ,key) ,fn))
      map))
 
-(defmacro hooks (mode-name/s function)
+(defmacro hooks (mode-name/s &rest functions)
   (assert (or (symbolp mode-name/s) (listp mode-name/s)))
   (cl-flet ((to-hook (name) (intern (format "%s-mode-hook" name))))
-    (if (symbolp mode-name/s)
-	`(add-hook ',(to-hook mode-name/s) ,function)
+    (cond
+     ((and (symbolp mode-name/s) (not (cdr functions)))
+      `(add-hook ',(to-hook mode-name/s) ,(car functions)))
+     ((symbolp mode-name/s)
+      `(progn
+	 ,@(loop for f in functions
+		 collect `(add-hook ',(to-hook mode-name/s) ,f))))
+     ((not (cdr functions))
       (let ((fn (gensym)))
-	`(let ((,fn ,function))
+	`(let ((,fn ,(car functions)))
 	   ,@(loop for m in mode-name/s
-		   collect `(add-hook ',(to-hook m) ,fn)))))))
+		   collect `(add-hook ',(to-hook m) ,fn)))))
+     (t
+      (let ((f-bindings (loop for f in functions collect (list (gensym) f))))
+	`(let ,f-bindings
+	   ,@(loop for m in mode-name/s
+		   append (loop for b in f-bindings
+				collect `(add-hook ',(to-hook m) ,(first b)) ))))))))
 
 (defmacro by-ext (extension/s mode)
   (assert (or (stringp extension/s) (listp extension/s)))
@@ -143,6 +155,5 @@
        (if (>= lightness 0.5) "white" "black"))
 
       (list color lightness))))
-
 
 (provide 'convenience)
