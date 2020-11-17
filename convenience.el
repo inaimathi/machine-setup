@@ -29,6 +29,13 @@
     (pp (macroexpand sexp)))
   (with-current-buffer "*el-macroexpansion*" (emacs-lisp-mode)))
 
+(defmacro if-let (name test then &optional else)
+  (let ((tmp (gensym)))
+    `(let ((,tmp ,test))
+       (if ,tmp
+	   (let ((,name ,tmp)) ,then)
+	 ,else))))
+
 ;;; Dealing with directories
 (defun starts-with-dot-p (path)
   (= (aref path 0) ?.))
@@ -132,28 +139,30 @@
     (substring hex-string 3 5)
     (substring hex-string 5))))
 
-(defmacro if-let (name test then &optional else)
-  (let ((tmp (gensym)))
-    `(let ((,tmp ,test))
-       (if ,tmp
-	   (let ((,name ,tmp)) ,then)
-	 ,else))))
+(defvar conv-colors
+  (list "LightBlue2" "LightCoral" "LightCyan"
+	"LightGoldenrod" "LightGoldenrod4" "LightGoldenrodYellow"
+	"LightGreen" "LightPink1" "LightSalmon" "LightSeaGreen"
+	"LightSkyBlue" "LightSlateBlue" "LightSlateGray"))
+
+(defcustom
+  conv-color-map (list)
+  "An alist that stores the mapping of virtual-envs to colors")
 
 (defun virtual-env-name ()
   (if-let venv (getenv "VIRTUAL_ENV")
     (file-name-nondirectory venv)))
 
 (defun color-of (input)
-  (concat "#" (substring (secure-hash 'md5 input) 0 6)))
+  (or
+   (cdr (assoc input conv-color-map #'string=))
+   (if-let (clr (first (set-difference conv-colors (mapcar #'cdr conv-color-map) :test #'string=)))
+       (let ((new-colors (cons (cons input clr) conv-color-map)))
+	 (customize-save-variable 'conv-color-map new-colors)
+	 clr))))
 
 (defun set-colors-by (input)
-  (when input
-    (let* ((color (color-of input))
-	   (lightness (third (apply #'color-rgb-to-hsl (hex->rgb (color-of input))))))
-      (set-background-color color)
-      (set-foreground-color
-       (if (>= lightness 0.5) "white" "black"))
-
-      (list color lightness))))
+  (when (and input (color-of input))
+    (set-background-color (color-of input))))
 
 (provide 'convenience)
