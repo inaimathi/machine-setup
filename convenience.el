@@ -140,7 +140,7 @@
     (substring hex-string 5))))
 
 (defvar conv-colors
-  (list "LightBlue2" "LightCoral" "LightCyan"
+  (list "LightBlue2" "LightCyan"
 	"LightGoldenrod" "LightGoldenrod4" "LightGoldenrodYellow"
 	"LightGreen" "LightPink1" "LightSalmon" "LightSeaGreen"
 	"LightSkyBlue" "LightSlateBlue" "LightSlateGray"))
