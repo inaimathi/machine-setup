@@ -1,0 +1,32 @@
+server {
+       listen 443 ssl;
+       ssl_certificate /etc/letsencrypt/live/inaimathi.ca/cert.pem;
+       ssl_certificate_key /etc/letsencrypt/live/inaimathi.ca/privkey.pem;
+
+       listen 80;
+       server_name langnostic.inaimathi.ca langnostic.inaimathi.com blog.inaimathi.com blog.inaimathi.ca inaimathi.ca inaimathi.com www.inaimathi.ca www.inaimathi.com;
+
+       rewrite .*/favicon.ico /static/img/favicon.ico last;
+
+        location /static/ {
+	   alias /home/inaimathi/langnostic/resources/public/;
+           expires 30d;
+        }
+
+        location / {
+                proxy_pass http://localhost:4444;
+                proxy_redirect off;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                client_max_body_size 10m;
+                client_body_buffer_size 128k;
+                proxy_connect_timeout 90;
+                proxy_send_timeout 90;
+                proxy_read_timeout 90;
+                proxy_buffer_size 4k;
+                proxy_buffers 4 32k;
+                proxy_busy_buffers_size 64k;
+                proxy_temp_file_write_size 64k;
+        }
+}

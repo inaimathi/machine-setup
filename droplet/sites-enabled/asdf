@@ -1,0 +1,11 @@
+server { 
+       listen 80;
+       server_name asdf.inaimathi.ca asdf.inaimathi.com;
+       root /home/inaimathi/asdf-archives;
+
+       autoindex on;
+
+       location / {
+       		try_files $uri $uri/ /index.html;
+       }
+}
