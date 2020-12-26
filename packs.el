@@ -5,9 +5,9 @@
 (package-initialize)
 
 (setq package-archives
-      '(("melpa" . "http://melpa.milkbox.net/packages/")
- 	("marmalade" . "http://marmalade-repo.org/packages/")
- 	("elpa" . "http://elpa.gnu.org/packages/")))
+      '(("melpa" . "http://melpa.org/packages/")
+ 	;; ("marmalade" . "https://marmalade-repo.org/packages/")
+ 	("elpa" . "https://elpa.gnu.org/packages/")))
 
 (defvar +package-list+
   '(elfeed
@@ -17,13 +17,13 @@
     markdown-mode haskell-mode clojure-mode cider
     py-isort flymake-python-pyflakes))
 
-(unless (every #'package-installed-p +package-list+)
+(unless (every #'featurep +package-list+)
 
   (unless package-archive-contents
     (package-refresh-contents))
 
   (dolist (p +package-list+)
-    (unless (package-installed-p p)
+    (unless (featurep p)
       (package-install p))))
 
 (provide 'packs)
