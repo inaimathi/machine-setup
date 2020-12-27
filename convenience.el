@@ -1,4 +1,4 @@
-(require 'cl)
+(require 'cl-lib)
 (require 'color)
 
 ;;; lisp basics
@@ -43,15 +43,15 @@
 (defun list-subdirectories (path)
   (let ((all (mapcar
 	      (lambda (name) (concat (file-name-as-directory path) name))
-	      (remove-if #'starts-with-dot-p (directory-files path)))))
-    (remove-if-not #'file-directory-p all)))
+	      (cl-remove-if #'starts-with-dot-p (directory-files path)))))
+    (cl-remove-if-not #'file-directory-p all)))
 
 (defun add-to-load-path (dirs)
   (mapc (lambda (p) (add-to-list 'load-path p)) dirs))
 
 ;;; key and mode declaration shortcuts
 (defmacro def-sparse-map (name/doc &rest key/fn-list)
-  (assert (and (listp name/doc)
+  (cl-assert (and (listp name/doc)
 	       (symbolp (first name/doc))
 	       (or (not (second name/doc))
 		   (stringp (second name/doc)))))
@@ -61,38 +61,38 @@
 
 (defmacro keys (keymap &rest key/fn-list)
   `(let ((map ,keymap))
-     ,@(loop for (key fn) on key/fn-list by #'cddr
+     ,@(cl-loop for (key fn) on key/fn-list by #'cddr
 	     collect `(define-key map (kbd ,key) ,fn))
      map))
 
 (defmacro hooks (mode-name/s &rest functions)
-  (assert (or (symbolp mode-name/s) (listp mode-name/s)))
+  (cl-assert (or (symbolp mode-name/s) (listp mode-name/s)))
   (cl-flet ((to-hook (name) (intern (format "%s-mode-hook" name))))
     (cond
      ((and (symbolp mode-name/s) (not (cdr functions)))
       `(add-hook ',(to-hook mode-name/s) ,(car functions)))
      ((symbolp mode-name/s)
       `(progn
-	 ,@(loop for f in functions
+	 ,@(cl-loop for f in functions
 		 collect `(add-hook ',(to-hook mode-name/s) ,f))))
      ((not (cdr functions))
       (let ((fn (gensym)))
 	`(let ((,fn ,(car functions)))
-	   ,@(loop for m in mode-name/s
+	   ,@(cl-loop for m in mode-name/s
 		   collect `(add-hook ',(to-hook m) ,fn)))))
      (t
-      (let ((f-bindings (loop for f in functions collect (list (gensym) f))))
+      (let ((f-bindings (cl-loop for f in functions collect (list (gensym) f))))
 	`(let ,f-bindings
-	   ,@(loop for m in mode-name/s
-		   append (loop for b in f-bindings
+	   ,@(cl-loop for m in mode-name/s
+		   append (cl-loop for b in f-bindings
 				collect `(add-hook ',(to-hook m) ,(first b)) ))))))))
 
 (defmacro by-ext (extension/s mode)
-  (assert (or (stringp extension/s) (listp extension/s)))
+  (cl-assert (or (stringp extension/s) (listp extension/s)))
   (cl-flet ((to-reg (ext) (format "\\.%s$" ext)))
     (if (stringp extension/s)
 	`(add-to-list 'auto-mode-alist '(,(to-reg extension/s) . ,mode))
-      `(progn ,@(loop for ext in extension/s
+      `(progn ,@(cl-loop for ext in extension/s
 		      collect `(add-to-list 'auto-mode-alist
 					    '(,(to-reg ext) . ,mode)))))))
 
@@ -117,7 +117,7 @@
   (save-excursion
     (beginning-of-buffer)
     (message "%d %s"
-	     (loop for count from 0 do (funcall inc-function) if (eobp) return count)
+	     (cl-loop for count from 0 do (funcall inc-function) if (eobp) return count)
 	     items)))
 
 ;;; Other

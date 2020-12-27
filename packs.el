@@ -17,7 +17,7 @@
     markdown-mode haskell-mode clojure-mode cider
     py-isort flymake-python-pyflakes))
 
-(unless (every #'featurep +package-list+)
+(unless (cl-every #'featurep +package-list+)
 
   (unless package-archive-contents
     (package-refresh-contents))
