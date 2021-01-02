@@ -19,7 +19,7 @@ fi
 if [ ! -f checkpoints/003-root.check ]
 then
    echo "   Installing basics that don't work out of guix..."
-   apt-get install pmount pacpl mtp-tools libblas-dev liblapack-dev gnupg gnupg-agent python3-pip
+   apt-get install pmount pacpl mtp-tools libblas-dev liblapack-dev gnupg gnupg-agent python3-pip slock
    touch checkpoints/003-root.check
 fi
 
