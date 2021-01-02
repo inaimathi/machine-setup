@@ -68,7 +68,7 @@ if [ ! -f checkpoints/005.check ]
 then
    echo "Setting up Python..."
    guix install python-setuptools python-pip python-lxml
-   pip install --user requests cssselect flake8 pylint pyflakes
+   pip install --user requests cssselect flake8 pylint pyflakes black lxml
    touch checkpoints/005.check
 fi
 
@@ -113,6 +113,9 @@ then
     cp ~/projects/shell-ui/python/* ~/bin/
     cp ~/projects/shell-ui/sh/* ~/bin/
     echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+    echo 'export PATH="~/.local/bin:$PATH"' >> ~/.bashrc
+    echo 'GUIX_PROFILE="/home/inaimathi/.guix-profile"' >> ~/.bashrc
+    echo '. "$GUIX_PROFILE/etc/profile"'>> ~/.bashrc
 fi
 
 git config --global user.email "leo.zovic@gmail.com"
