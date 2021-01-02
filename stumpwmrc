@@ -12,7 +12,7 @@
 
 (defcommand dmenu-run () () (run-shell-command "dmenu_run"))
 
-(defcommand lock-screen () () (run-shell-command "gnome-screensaver-command -l"))
+(defcommand lock-screen () () (run-shell-command "slock"))
 
 (defcommand ssh-add () () (run-shell-command "ssh-add"))
 
