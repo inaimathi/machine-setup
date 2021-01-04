@@ -156,10 +156,10 @@
 (defun color-of (input)
   (or
    (cdr (assoc input conv-color-map #'string=))
-   (if-let (clr (first (set-difference conv-colors (mapcar #'cdr conv-color-map) :test #'string=)))
-       (let ((new-colors (cons (cons input clr) conv-color-map)))
-	 (customize-save-variable 'conv-color-map new-colors)
-	 clr))))
+   (if-let clr (first (set-difference conv-colors (mapcar #'cdr conv-color-map) :test #'string=))
+     (let ((new-colors (cons (cons input clr) conv-color-map)))
+       (customize-save-variable 'conv-color-map new-colors)
+       clr))))
 
 (defun set-colors-by (input)
   (when (and input (color-of input))
