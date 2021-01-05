@@ -23,4 +23,14 @@ then
    touch checkpoints/003-root.check
 fi
 
+if [ ! -f checkpoints/004-root.check ]
+then
+    echo "   Adding known-good DNS servers..."
+    for i in `ip a | grep -oP "^[0-9]: \K(\w+)(?:)"`;
+    do if [ $i != "lo" ]
+       then sudo systemd-resolve --interface=$i --set-dns=8.8.8.8
+       fi;
+    done
+fi
+
 loadkeys /home/inaimathi/caps2ctrl.map
