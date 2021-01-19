@@ -29,7 +29,7 @@
     (pp (macroexpand sexp)))
   (with-current-buffer "*el-macroexpansion*" (emacs-lisp-mode)))
 
-(defmacro if-let (name test then &optional else)
+(defmacro -if-let (name test then &optional else)
   (let ((tmp (gensym)))
     `(let ((,tmp ,test))
        (if ,tmp
@@ -150,13 +150,13 @@
   "An alist that stores the mapping of virtual-envs to colors")
 
 (defun virtual-env-name ()
-  (if-let venv (getenv "VIRTUAL_ENV")
+  (-if-let venv (getenv "VIRTUAL_ENV")
     (file-name-nondirectory venv)))
 
 (defun color-of (input)
   (or
    (cdr (assoc input conv-color-map #'string=))
-   (if-let clr (first (set-difference conv-colors (mapcar #'cdr conv-color-map) :test #'string=))
+   (-if-let clr (first (set-difference conv-colors (mapcar #'cdr conv-color-map) :test #'string=))
      (let ((new-colors (cons (cons input clr) conv-color-map)))
        (customize-save-variable 'conv-color-map new-colors)
        clr))))
