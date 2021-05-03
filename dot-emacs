@@ -146,7 +146,11 @@
 (require 'flymake-python-pyflakes)
 (setq
  flymake-python-pyflakes-executable "flake8"
- python-shell-interpreter "python")
+ python-shell-interpreter
+ (let ((python-v (python-version)))
+   (if (= (car python-v) 3)
+       "python"
+       "python3")))
 (hooks python
        (lambda ()
 	 (setq autopair-handle-action-fns

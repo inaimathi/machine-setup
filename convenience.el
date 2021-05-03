@@ -53,8 +53,8 @@
 (defmacro def-sparse-map (name/doc &rest key/fn-list)
   (cl-assert (and (listp name/doc)
 	       (symbolp (first name/doc))
-	       (or (not (second name/doc))
-		   (stringp (second name/doc)))))
+	       (or (not (cadr name/doc))
+		   (stringp (cadr name/doc)))))
   `(defvar ,(first name/doc)
      (keys (make-sparse-keymap) ,@key/fn-list)
      ,@(cdr name/doc)))
@@ -152,6 +152,16 @@
 (defun virtual-env-name ()
   (-if-let venv (getenv "VIRTUAL_ENV")
     (file-name-nondirectory venv)))
+
+(defun python-version ()
+  (mapcar
+   #'string-to-number
+   (split-string
+    (cadr
+     (split-string
+      (string-trim
+       (shell-command-to-string "python --version"))))
+    "\\.")))
 
 (defun color-of (input)
   (or
