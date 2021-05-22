@@ -4,25 +4,45 @@
 
 (message "Loading RC...")
 
-(defmacro defcomm ((name kbd) &body body)
-  `(progn
-     (defcommand ,name () () ,@body)
-     (define-key *root-map* (kbd ,kbd) ,(symbol-name name))))
-
-(message "  Defining keys...")
-
-(defcomm (dmenu-run "C-p") (run-shell-command "dmenu_run"))
-(defcomm (log-out "C-q") (run-shell-command "pkill -u \"$USER\""))
-(defcomm (lock-screen "C-l") (run-shell-command "slock"))
-(defcomm (reinit "C-r") (run-commands "reload" "loadrc"))
-(define-key *root-map* (kbd "RET") "exec x-terminal-emulator")
-
-(message "  Running startup functions...")
+(defcommand switch/register-guy-mcguy () ()
+  (message "Filling register form...")
+  (let ((email (format nil "guymcguy~a@mailinator.com" (get-universal-time))))
+    (window-send-string
+     (format nil "Guy	M	McGuy	~a	~a" email email))))
 
 (defcommand cap-caps () ()
   (message "Killing caps-lock...")
   (run-shell-command "setxkbmap -layout us -option ctrl:nocaps"))
 
+(defcommand reinit () () (run-commands "reload" "loadrc"))
+
+(defcommand dmenu-run () () (run-shell-command "dmenu_run"))
+
+(defcommand lock-screen () () (run-shell-command "slock"))
+
 (defcommand ssh-add () () (run-shell-command "ssh-add"))
 
-(run-commands "cap-caps" "ssh-add")
+(defcommand dunst-server () () (run-shell-command "dunst &"))
+
+(defcommand screenshot () ()
+  (let ((name (run-shell-command "echo \"$(mktemp -p ~/pictures/screenshots/ --suffix=.png)\"" t)))
+    (message "Screenshotting...")
+    (run-shell-command "import ~/pictures/screenshot.png" t)
+    (run-shell-command (format nil "cp ~~/pictures/screenshot.png ~a" name))
+    (message (format nil "  shot to ~a" name))))
+
+(message "  Defining keys...")
+
+(define-key *root-map* (kbd "C-s") "switch/register-guy-mcguy")
+
+(define-key *root-map* (kbd "C-r") "reinit")
+(define-key *root-map* (kbd "RET") "exec x-terminal-emulator")
+(define-key *root-map* (kbd "C-p") "dmenu-run")
+(define-key *root-map* (kbd "p") "dmenu-run")
+(define-key *root-map* (kbd "C-l") "lock-screen")
+(define-key *root-map* (kbd "SunPrint_Screen") "screenshot")
+(define-key *root-map* (kbd "C-SunPrint_Screen") "screenshot")
+
+(message "  Running startup functions...")
+
+(run-commands "cap-caps" "ssh-add" "dunst-server")
