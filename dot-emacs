@@ -1,16 +1,16 @@
-;; Requiring convenience early 'cause I like having sugar to deal with load path.
-(add-to-list 'load-path "~/.emacs.d/mine")
+(add-to-list 'load-path user-emacs-directory)
+(add-to-list 'load-path (concat user-emacs-directory "mine"))
 (require 'convenience)
 (require 'packs)
 
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
-; (add-to-list 'load-path "/home/inaimathi/.nix-profile/share/emacs/site-lisp")
+(add-to-list 'load-path (expand-file-name "~/.nix-profile/share/emacs/site-lisp"))
 
 ;; cosmetics
 (setq scroll-bar-mode-explicit t)
 (set-scroll-bar-mode `right)
-
+(setq js-indent-level 2)
 (add-hook 'git-commit-mode-hook
 	  '(lambda ()
 	     (auto-fill-mode 0))
@@ -44,13 +44,9 @@
 (add-hook
  'before-save-hook
  (lambda (&optional start end)
-   ;; (unless (or (string-match "howl/README.md" buffer-file-name)
-   ;; 	       (string-match "\\.howl" buffer-file-name))
-   ;; (delete-trailing-whitespace start end)
-   ;;   )
    (delete-trailing-whitespace start end)
    (when (string-match "\\.py" buffer-file-name)
-     (unless (string-match "api.py" buffer-file-name)
+     (unless (or *switch?* (string-match "api.py" buffer-file-name))
        (py-isort-before-save)))))
 
 (require 'magit)
@@ -59,8 +55,11 @@
 (require 'yasnippet)
 (yas/global-mode 1)
 
-(require 'autopair)
-(autopair-global-mode)
+(require 'flex-autopair)
+(add-to-list 'flex-autopair-pairs '(?\< . ?\>))
+(add-to-list 'flex-autopair-pairs '(?\{ . ?\}))
+(define-globalized-minor-mode global-autopair flex-autopair-mode
+  (lambda () (flex-autopair-mode 1)))
 
 ;; unique buffer names (for similarly named files in different directories
 (require 'uniquify)
@@ -72,7 +71,6 @@
 ;; editing/general convenience addons
 (global-mode highlight-parentheses-mode)
 (global-mode column-number-mode)
-(require 'smart-tab)
 ;; (require 'redo+)
 (require 'hideshow)
 (require 'auto-complete-config)
@@ -98,7 +96,6 @@
 	("http://killsixbilliondemons.com/feed/" comic)
 	("http://www.threepanelsoul.com/rss.php" rare-comic)
 	("http://www.smbc-comics.com/rss.php" comic)
-	("http://feeds.feedburner.com/CartesianClosedComic" rare-comic)
 
 	;; ("http://stackexchange.com/feeds/tagsets/43442/inaimathi-lang-digests?sort=active" stack)
 	;; ("http://stackexchange.com/feeds/tagsets/211649/inaimathi-js-digest?sort=newest" stack)
@@ -143,24 +140,48 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;; Python
-(require 'flymake-python-pyflakes)
-(setq
- flymake-python-pyflakes-executable "flake8"
- python-shell-interpreter
- (let ((python-v (python-version)))
-   (if (= (car python-v) 3)
-       "python"
-       "python3")))
+(defvar *switch?*
+  (string= "env-switch-api" (virtual-env-name)))
+(unless *switch?*
+  (require 'flymake-python-pyflakes)
+  (setq flymake-python-pyflake-sexecutable "flake8"))
+(setq python-shell-interpreter
+      (let ((python-v (python-version)))
+	(if (= (car python-v) 3)
+	    "python"
+	  "python3.7")))
 (hooks python
        (lambda ()
 	 (setq autopair-handle-action-fns
 	       (list #'autopair-default-handle-action
 		     #'autopair-python-triple-quote-action))
-	 (python-black-on-save-mode)
 	 (keys (current-local-map)
 	       "C-," 'flymake-goto-next-error
-	       "C-." 'flymake-goto-prev-error))
-       'flymake-python-pyflakes-load)
+	       "C-." 'flymake-goto-prev-error)
+	 (unless *switch?*
+	   (python-black-on-save-mode)
+	   (flymake-python-pyflakes-load))))
+
+;;;;;;;;;; Typescript
+(setq-default typescript-indent-level 2)
+(by-ext ("tsx") typescript-mode)
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1))
+
+;; (add-hook 'before-save-hook 'tide-format-before-save)
+(hooks typescript
+       (lambda ()
+	 (setup-tide-mode)
+	 (setq indent-tabs-mode nil)
+	 (keys (current-local-map)
+	       "C-," 'flycheck-next-error
+	       "C-." 'flycheck-prev-error))
+       #'setup-tide-mode)
 
 ;;;;;;;;;; SML
 ; (require 'sml-mode)
@@ -169,7 +190,7 @@
 ;;;;;;;;;; Lisp
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
 (slime-setup '(slime-fancy))
-
+(require 'clojure-mode)
 (autoload 'enable-paredit-mode "paredit"
   "Turn on pseudo-structural editing of Lisp code."
   t)
@@ -246,38 +267,49 @@
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
  '(blog-default-blogger-title "language agnostic")
- '(blog-default-blogger-user (quote leo\.zovic@gmail\.com))
- '(custom-enabled-themes (quote (whiteboard)))
+ '(blog-default-blogger-user 'leo\.zovic@gmail\.com)
+ '(conv-color-map
+   '(("env-switch-ui" . "LightSlateGray")
+     ("env-switch-api" . "LightSkyBlue")
+     ("grizzly.backend-DOXkManf-py3.7" . "LightSkyBlue")
+     ("env-grizzly" . "LightGreen")
+     ("env-terra" . "LightSeaGreen")
+     ("env-pageclass" . "LightSalmon")
+     ("env-panda" . "LightPink1")
+     ("env-metastore" . "LightGreen")
+     ("env-bearherd" . "LightGoldenrodYellow")
+     ("env-pytrade" . "LightGoldenrod4")
+     ("env-enlive" . "LightGoldenrod")
+     ("env-growl" . "LightCyan")
+     ("env-dupe-detection" . "LightBlue2")))
+ '(custom-enabled-themes '(whiteboard))
  '(haskell-mode-hook
-   (quote
-    (turn-on-haskell-indent
+   '(turn-on-haskell-indent
      (lambda nil
-       (auto-complete-mode t)))) t)
+       (auto-complete-mode t))) t)
  '(haskell-program-name "cabal repl" t)
- '(htmlize-output-type (quote inline-css))
+ '(htmlize-output-type 'inline-css)
  '(icomplete-mode t)
  '(inf-ruby-implementations
-   (quote
-    (("ruby" . "irb2.1 --prompt default --noreadline -r irb/completion")
+   '(("ruby" . "irb2.1 --prompt default --noreadline -r irb/completion")
      ("jruby" . "jruby -S irb --prompt default --noreadline -r irb/completion")
      ("rubinius" . "rbx -r irb/completion")
      ("yarv" . "irb1.9 -r irb/completion")
      ("macruby" . "macirb -r irb/completion")
-     ("pry" . "pry"))))
+     ("pry" . "pry")))
  '(lpr-command "lp")
- '(magit-process-connection-type t)
- '(magit-revert-item-confirm nil)
  '(menu-bar-mode nil)
- '(org-log-done (quote note))
+ '(org-log-done 'note)
  '(package-selected-packages
-   (quote
-    (sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode py-isort flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab autopair highlight-parentheses magit aes elfeed)))
+   '(vue-mode company tide typescript-mode flycheck rjsx-mode magit agda2-mode sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab autopair highlight-parentheses aes elfeed))
  '(quack-programs
-   (quote
-    ("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
+   '("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))
  '(scheme-program-name "racket")
  '(show-paren-mode t)
  '(tool-bar-mode nil)
+ '(tramp-copy-size-limit 1000000)
+ '(tramp-default-method "ssh")
+ '(tramp-inline-compress-start-size 1000000)
  '(transient-mark-mode t))
 (put 'downcase-region 'disabled nil)
 (custom-set-faces
@@ -292,3 +324,6 @@
 (put 'upcase-region 'disabled nil)
 
 (set-colors-by (virtual-env-name))
+
+(load-file (let ((coding-system-for-read 'utf-8))
+                (shell-command-to-string "agda-mode locate")))

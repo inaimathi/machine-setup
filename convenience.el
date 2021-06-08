@@ -52,10 +52,10 @@
 ;;; key and mode declaration shortcuts
 (defmacro def-sparse-map (name/doc &rest key/fn-list)
   (cl-assert (and (listp name/doc)
-	       (symbolp (first name/doc))
+	       (symbolp (car name/doc))
 	       (or (not (cadr name/doc))
 		   (stringp (cadr name/doc)))))
-  `(defvar ,(first name/doc)
+  `(defvar ,(car name/doc)
      (keys (make-sparse-keymap) ,@key/fn-list)
      ,@(cdr name/doc)))
 
@@ -85,7 +85,7 @@
 	`(let ,f-bindings
 	   ,@(cl-loop for m in mode-name/s
 		   append (cl-loop for b in f-bindings
-				collect `(add-hook ',(to-hook m) ,(first b)) ))))))))
+				collect `(add-hook ',(to-hook m) ,(car b)) ))))))))
 
 (defmacro by-ext (extension/s mode)
   (cl-assert (or (stringp extension/s) (listp extension/s)))
@@ -143,7 +143,7 @@
   (list "LightBlue2" "LightCyan"
 	"LightGoldenrod" "LightGoldenrod4" "LightGoldenrodYellow"
 	"LightGreen" "LightPink1" "LightSalmon" "LightSeaGreen"
-	"LightSkyBlue" "LightSlateBlue" "LightSlateGray"))
+	"LightSkyBlue" "LightSlateGray"))
 
 (defcustom
   conv-color-map (list)
@@ -166,7 +166,7 @@
 (defun color-of (input)
   (or
    (cdr (assoc input conv-color-map #'string=))
-   (-if-let clr (first (set-difference conv-colors (mapcar #'cdr conv-color-map) :test #'string=))
+   (-if-let clr (car (cl-set-difference conv-colors (mapcar #'cdr conv-color-map) :test #'string=))
      (let ((new-colors (cons (cons input clr) conv-color-map)))
        (customize-save-variable 'conv-color-map new-colors)
        clr))))

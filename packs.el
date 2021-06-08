@@ -2,22 +2,23 @@
 
 (add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
 
-(package-initialize)
-
-(setq package-archives
-      '(("melpa" . "http://melpa.org/packages/")
- 	;; ("marmalade" . "https://marmalade-repo.org/packages/")
- 	("elpa" . "https://elpa.gnu.org/packages/")))
-
 (defvar +package-list+
   '(elfeed
     aes
-    magit highlight-parentheses autopair smart-tab
-    auto-complete yasnippet paredit
+    magit highlight-parentheses flex-autopair auto-complete yasnippet paredit
     markdown-mode haskell-mode clojure-mode cider
     py-isort flymake-python-pyflakes))
 
-(unless (cl-every #'featurep +package-list+)
+(unless (cl-every (lambda (p) (require p nil 'noerror)) +package-list+)
+
+  (package-initialize)
+
+  (setq package-archives
+	'(("melpa-stable" . "http://stable.melpa.org/packages/")
+	  ("melpa" . "http://melpa.org/packages/")
+ 	  ;;("marmalade" . "https://marmalade-repo.org/packages/")
+ 	  ("elpa" . "https://elpa.gnu.org/packages/")
+	  ))
 
   (unless package-archive-contents
     (package-refresh-contents))
