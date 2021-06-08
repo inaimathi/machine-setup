@@ -4,10 +4,6 @@ Installation scripts to make setting up a new linux machine easier for me.
 
 Note the **me** in the above sentence. This is highly unlikely to be useful to **you**, except perhaps as a script collection to pillage chunklets of.
 
-## TODO
-
-- Removed the emacs packages from `nix`-land, since they seem to have disappeared :/ (put together a `setup.el` file, I guess)
-
 ## Usage
 
 If you're future me,
@@ -17,10 +13,10 @@ If you're future me,
 
 You should then be able to do all the cool things you want to do with no hassle.
 
-If you're not me ... probably best not to. This script is optimized to my idiosyncratic machine setup (and actually assumes a particular piece of hardware at the moment too). The result will be a system set up to run under Xmonad with no window manager, minimal external volume automation, and an emacs-like set of keystrokes for piloting. You'll want to tear most of it out and replace it with something similarly useful to you.
+If you're not me ... probably best not to. This script is optimized to my idiosyncratic machine setup (and actually assumes a particular piece of hardware at the moment too). The result will be a system set up to run under StumpWM with no underlying desktop environment, minimal external volume automation, and an emacs-like set of keystrokes for piloting. You'll want to tear most of it out and replace it with something similarly useful to you.
 
 ## Rationale
 
-- install everything you can from `nix`
-- things that don't work/aren't available from nix, install from the Debian repos
+- install everything you can from `guix`
+- things that don't work/aren't available from guix, install from the Debian repos
 - language-specific libraries install via language-specific build tools (`quicklisp`, `opam`, `stack`, `pip`, etc)
