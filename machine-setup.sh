@@ -69,6 +69,7 @@ then
    echo "Setting up Python..."
    guix install python-setuptools python-pip python-lxml
    pip install --user requests cssselect flake8 pylint pyflakes black lxml
+   pip3 install --user requests cssselect flake8 pylint pyflakes black lxml selenium
    touch checkpoints/005.check
 fi
 
