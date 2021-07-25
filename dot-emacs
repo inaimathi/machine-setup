@@ -203,9 +203,6 @@
 	 "}" 'paredit-close-curly))
 
 (hooks (common-lisp lisp emacs-lisp scheme lisp-interaction slime clojure slime-repl)
-       (lambda ()
-	 (setq autopair-dont-activate t)
-	 (autopair-mode -1))
        'enable-paredit-mode
        (lambda () (set-syntax-table (set-syntax-table clojure-mode-syntax-table))))
 
@@ -301,7 +298,7 @@
  '(menu-bar-mode nil)
  '(org-log-done 'note)
  '(package-selected-packages
-   '(vue-mode company tide typescript-mode flycheck rjsx-mode magit agda2-mode sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab autopair highlight-parentheses aes elfeed))
+   '(vue-mode company tide typescript-mode flycheck rjsx-mode magit agda2-mode sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab highlight-parentheses aes elfeed))
  '(quack-programs
    '("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))
  '(scheme-program-name "racket")
