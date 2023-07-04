@@ -77,7 +77,7 @@ if [ ! -d ~/.emacs.d/mine ]
 then
    echo "Setting up Emacs..."
    mkdir -p ~/.emacs.d/mine
-   cp convenience.el packs.el ~/.emacs.d/mine/
+   cp emacs/* ~/.emacs.d/mine/
    mkdir ~/.emacs.d/elpa
 fi
 

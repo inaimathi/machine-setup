@@ -2,6 +2,7 @@
 (add-to-list 'load-path (concat user-emacs-directory "mine"))
 (require 'convenience)
 (require 'packs)
+(require 'aidev)
 
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
