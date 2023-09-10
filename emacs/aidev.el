@@ -43,4 +43,30 @@
           (delete-region reg-start reg-end)
           (insert (aidev-first-message-content data))))))))
 
+(defun aidev-explain-region ()
+  (interactive)
+  (aidev--chat
+   `((("role" . "system")
+      ("content" . "You are a brilliant writer and veteran programmer, able to put concepts into a simple and straightforward context undestandeable to any reader. You also have a comprehensive understanding of all programming languages from prominent to obscure. The user is asking you to explain a block of code they are working with. Read over the code and provide the clearest explanation of what the code does, how to use it, and the natural ways in which it might be changed. Return the best answer you possibly can after thinking about it carefully."))
+     (("role" . "system")
+      ("content" . ,(format "The user is currently working in the major mode '%s', so please return code appropriate for that context." major-mode)))
+     (("role" . "user")
+      ("content" . ,(buffer-substring-no-properties (region-beginning) (region-end)))))
+   (cl-function
+    (lambda (&key data &allow-other-keys)
+      (insert (aidev-first-message-content data))))))
+
+(defun aidev-explain-region-in-particular (prompt)
+  (interactive "sPrompt: ")
+  (aidev--chat
+   `((("role" . "system")
+      ("content" . "You are a brilliant writer and veteran programmer, able to put concepts into a simple and straightforward context undestandeable to any reader. You also have a comprehensive understanding of all programming languages from prominent to obscure. The user is asking you to explain a block of code they are working with, but they have specific questions. Read over the code and provide the clearest explanation of what the code does, making sure to answer the users' specific question. Return the best answer you possibly can after thinking about it carefully."))
+     (("role" . "system")
+      ("content" . ,(format "The user is currently working in the major mode '%s', so please return code appropriate for that context." major-mode)))
+     (("role" . "user")
+      ("content" . ,(buffer-substring-no-properties (region-beginning) (region-end)))))
+   (cl-function
+    (lambda (&key data &allow-other-keys)
+      (insert (aidev-first-message-content data))))))
+
 (provide 'aidev)
