@@ -3,10 +3,9 @@
 (add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
 
 (defvar +package-list+
-  '(elfeed
-    aes
-    magit highlight-parentheses flex-autopair auto-complete yasnippet paredit
-    markdown-mode haskell-mode clojure-mode cider
+  '(aes
+    magit highlight-parentheses autopair auto-complete yasnippet paredit ;; flex-autopair
+    markdown-mode haskell-mode clojure-mode cider sml-mode
     py-isort flymake-python-pyflakes))
 
 (unless (cl-every (lambda (p) (require p nil 'noerror)) +package-list+)

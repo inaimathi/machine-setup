@@ -47,7 +47,7 @@
  (lambda (&optional start end)
    (delete-trailing-whitespace start end)
    (when (string-match "\\.py" buffer-file-name)
-     (unless (or *switch?* (string-match "api.py" buffer-file-name))
+     (unless (string-match "api.py" buffer-file-name)
        (py-isort-before-save)))))
 
 (require 'magit)
@@ -56,11 +56,14 @@
 (require 'yasnippet)
 (yas/global-mode 1)
 
-(require 'flex-autopair)
-(add-to-list 'flex-autopair-pairs '(?\< . ?\>))
-(add-to-list 'flex-autopair-pairs '(?\{ . ?\}))
-(define-globalized-minor-mode global-autopair flex-autopair-mode
-  (lambda () (flex-autopair-mode 1)))
+(require 'autopair)
+(autopair-global-mode)
+
+;; (require 'flex-autopair)
+;; (add-to-list 'flex-autopair-pairs '(?\< . ?\>))
+;; (add-to-list 'flex-autopair-pairs '(?\{ . ?\}))
+;; (define-globalized-minor-mode global-autopair flex-autopair-mode
+;;   (lambda () (flex-autopair-mode 1)))
 
 ;; unique buffer names (for similarly named files in different directories
 (require 'uniquify)
@@ -78,57 +81,6 @@
 (hooks (slime common-lisp emacs-lisp lisp python haskell)
        (lambda () (auto-complete-mode t)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; RSS-related
-(require 'elfeed)
-(setq elfeed-feeds
-      '(("http://blog.inaimathi.ca/feed/atom" blog)
-	("http://www.antipope.org/charlie/blog-static/atom.xml" blog)
-	("http://existentialtype.wordpress.com/feed/" blog)
-	("http://vile-jelly-blog.tumblr.com/rss" blog)
-
-	("http://feeds.feedburner.com/RahdoTalksThrough" boardgames)
-	("https://www.youtube.com/feeds/videos.xml?user=rahdo" boardgames)
-	("http://kicktracker.inaimathi.ca/board-games" boardgames)
-
-	("http://what-if.xkcd.com/feed.atom" comic)
-	("http://xkcd.com/rss.xml" comic)
-	("http://www.marycagle.com/rss.php" rare-comic)
-	("http://www.lutherlevy.com/?feed=rss2" comic)
-	("http://killsixbilliondemons.com/feed/" comic)
-	("http://www.threepanelsoul.com/rss.php" rare-comic)
-	("http://www.smbc-comics.com/rss.php" comic)
-
-	;; ("http://stackexchange.com/feeds/tagsets/43442/inaimathi-lang-digests?sort=active" stack)
-	;; ("http://stackexchange.com/feeds/tagsets/211649/inaimathi-js-digest?sort=newest" stack)
-	))
-
-(defun elfeed-search-copy-all ()
-  (interactive)
-  (save-excursion
-    (beginning-of-buffer)
-    (let ((links nil)
-	  (cur (elfeed-search-selected :ignore-region)))
-      (while cur
-	(when (elfeed-tagged-p 'unread cur)
-	  (push (elfeed-entry-link cur) links)
-	  (elfeed-untag cur 'unread)
-	  (elfeed-search-update-line))
-	(forward-line)
-	(setf cur (elfeed-search-selected :ignore-region)))
-      (let ((res (mapconcat 'identity (reverse links) " ")))
-	(kill-new res)
-	(if (fboundp 'gui-set-selection)
-	    (gui-set-selection elfeed-search-clipboard-type res)
-	  (with-no-warnings
-	    (x-set-selection elfeed-search-clipboard-type res)))))))
-
-(hooks elfeed-search
-       (lambda ()
-	 (keys (current-local-map)
-	       "Y" 'elfeed-search-copy-all)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; language/markup modes
-
 ;;;;;;;;;; Markdown
 (autoload 'markdown-mode "markdown-mode.el" "Major mode for editing Markdown files" t)
 (hooks markdown
@@ -141,11 +93,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;; Python
-(defvar *switch?*
-  (string= "env-switch-api" (virtual-env-name)))
-(unless *switch?*
-  (require 'flymake-python-pyflakes)
-  (setq flymake-python-pyflake-sexecutable "flake8"))
+(require 'flymake-python-pyflakes)
+(setq flymake-python-pyflake-sexecutable "flake8 --ignore=E501")
 (setq python-shell-interpreter
       (let ((python-v (python-version)))
 	(if (= (car python-v) 3)
@@ -159,9 +108,8 @@
 	 (keys (current-local-map)
 	       "C-," 'flymake-goto-next-error
 	       "C-." 'flymake-goto-prev-error)
-	 (unless *switch?*
-	   (python-black-on-save-mode)
-	   (flymake-python-pyflakes-load))))
+	 (python-black-on-save-mode)
+	 (flymake-python-pyflakes-load)))
 
 ;;;;;;;;;; Typescript
 (setq-default typescript-indent-level 2)
@@ -185,8 +133,8 @@
        #'setup-tide-mode)
 
 ;;;;;;;;;; SML
-; (require 'sml-mode)
-; (by-ext ("ml" "sml") sml-mode)
+(require 'sml-mode)
+(by-ext ("ml" "sml") sml-mode)
 
 ;;;;;;;;;; Lisp
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
@@ -267,18 +215,9 @@
  '(blog-default-blogger-title "language agnostic")
  '(blog-default-blogger-user 'leo\.zovic@gmail\.com)
  '(conv-color-map
-   '(("env-switch-ui" . "LightSlateGray")
-     ("env-switch-api" . "LightSkyBlue")
-     ("grizzly.backend-DOXkManf-py3.7" . "LightSkyBlue")
-     ("env-grizzly" . "LightGreen")
-     ("env-terra" . "LightSeaGreen")
-     ("env-pageclass" . "LightSalmon")
-     ("env-panda" . "LightPink1")
+   '(("env-pageclass" . "LightSalmon")
      ("env-metastore" . "LightGreen")
-     ("env-bearherd" . "LightGoldenrodYellow")
      ("env-pytrade" . "LightGoldenrod4")
-     ("env-enlive" . "LightGoldenrod")
-     ("env-growl" . "LightCyan")
      ("env-dupe-detection" . "LightBlue2")))
  '(custom-enabled-themes '(whiteboard))
  '(haskell-mode-hook
