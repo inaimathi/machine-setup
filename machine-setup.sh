@@ -37,8 +37,10 @@ fi
 
 if [ ! -f checkpoints/002.check ]:
 then
-   echo "Slaughtering CapsLock..."
+   echo ".bashrc changes..."
    setxkbmap -layout us -option ctrl:nocaps
+   echo "setxkbmap -layout us -option ctrl:nocaps" >> ~/.bashrc
+   echo 'eval "$(ssh-agent)"' >> ~/.bashrc
    touch checkpoints/002.check
 fi
 
