@@ -18,7 +18,7 @@ fi
 if [ ! -f checkpoints/003-root.check ]
 then
    echo "   Installing basics that don't work out of guix..."
-   apt-get install pmount pacpl mtp-tools libblas-dev liblapack-dev gnupg gnupg-agent python3-pip slock pavucontrol curl
+   apt-get install pmount pacpl mtp-tools libblas-dev liblapack-dev gnupg gnupg-agent python3-pip slock pavucontrol curl jq
    touch checkpoints/003-root.check
 fi
 
@@ -39,10 +39,11 @@ then
     sudo add-apt-repository ppa:criu/ppa
     curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
     apt update
-    apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin criu
-    apt install nvidia-container-toolkit
+    apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt install nvidia-container-toolkit criu
     usermod -aG docker inaimathi
     nvidia-ctk runtime configure
+    jq '.experimental=true' /etc/docker/daemon.json > tmp.json && mv tmp.json /etc/docker/daemon.json
     service docker restart
     curl -o /usr/local/bin/cog -L "https://github.com/replicate/cog/releases/latest/download/cog_$(uname -s)_$(uname -m)"
     chmod +x /usr/local/bin/cog

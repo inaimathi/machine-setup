@@ -47,9 +47,11 @@ fi
 if [ ! -f checkpoints/003.check ]:
 then
    echo "Setting up basics..."
-   guix install dmenu dunst rsync htop emacs git icecat sbcl mplayer feh make screen gimp inkscape youtube-dl acpi
-   echo "Setting up Lisp..."
-   guix install sbcl
+   guix install dmenu dunst rsync htop emacs git mplayer feh make screen acpi
+   guix install gimp inkscape icecat youtube-dl
+   echo "Keeping underlying LISP version of sbcl (installed with stumpwm earlier)..."
+   # echo ")Setting up Lisp..."
+   # guix install sbcl
    touch checkpoints/003.check
 fi
 
