@@ -47,7 +47,7 @@ fi
 if [ ! -f checkpoints/003.check ]:
 then
    echo "Setting up basics..."
-   guix install dmenu dunst rsync htop emacs git icecat sbcl mplayer feh make screen gimp inkscape youtube-dl curl acpi
+   guix install dmenu dunst rsync htop emacs git icecat sbcl mplayer feh make screen gimp inkscape youtube-dl acpi
    echo "Setting up Lisp..."
    guix install sbcl
    touch checkpoints/003.check
@@ -100,6 +100,15 @@ then
    mkdir -p ~/pictures/backgrounds
    mkdir -p ~/pictures/screenshots ~/projects ~/downloads ~/books ~/videos ~/bin
    touch checkpoints/006.check
+fi
+
+if [ ! -f checkpoints/007.check ]
+then
+    echo "Setting up docker and cog BS..."
+    newgrp docker
+    echo 'newgrp docker' >> ~/.bashrc
+    docker run hello-world
+    touch checkpoints/007.check
 fi
 
 if [ ! -d ~/projects ]
