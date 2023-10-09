@@ -1,4 +1,3 @@
-(add-to-list 'load-path user-emacs-directory)
 (add-to-list 'load-path (concat user-emacs-directory "mine"))
 (require 'convenience)
 (require 'packs)
@@ -56,14 +55,11 @@
 (require 'yasnippet)
 (yas/global-mode 1)
 
-(require 'autopair)
-(autopair-global-mode)
-
-;; (require 'flex-autopair)
-;; (add-to-list 'flex-autopair-pairs '(?\< . ?\>))
-;; (add-to-list 'flex-autopair-pairs '(?\{ . ?\}))
-;; (define-globalized-minor-mode global-autopair flex-autopair-mode
-;;   (lambda () (flex-autopair-mode 1)))
+(require 'flex-autopair)
+(add-to-list 'flex-autopair-pairs '(?\< . ?\>))
+(add-to-list 'flex-autopair-pairs '(?\{ . ?\}))
+(define-globalized-minor-mode global-autopair flex-autopair-mode
+  (lambda () (flex-autopair-mode 1)))
 
 ;; unique buffer names (for similarly named files in different directories
 (require 'uniquify)
@@ -261,6 +257,3 @@
 (put 'upcase-region 'disabled nil)
 
 (set-colors-by (virtual-env-name))
-
-(load-file (let ((coding-system-for-read 'utf-8))
-                (shell-command-to-string "agda-mode locate")))

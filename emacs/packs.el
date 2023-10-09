@@ -3,8 +3,8 @@
 (add-to-load-path (list-subdirectories "~/.emacs.d/elpa"))
 
 (defvar +package-list+
-  '(aes
-    magit highlight-parentheses autopair auto-complete yasnippet paredit ;; flex-autopair
+  '(aes request
+    magit highlight-parentheses auto-complete yasnippet paredit flex-autopair
     markdown-mode haskell-mode clojure-mode cider sml-mode
     py-isort flymake-python-pyflakes))
 
