@@ -106,10 +106,9 @@ fi
 
 if [ ! -f checkpoints/007.check ]
 then
-    echo "Setting up docker and cog BS..."
-    newgrp docker
-    echo 'newgrp docker' >> ~/.bashrc
+    echo "Double-check non-root docker stuff..."
     docker run hello-world
+    echo 'newgrp docker' >> ~/.bashrc
     touch checkpoints/007.check
 fi
 
