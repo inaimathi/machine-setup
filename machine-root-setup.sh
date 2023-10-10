@@ -42,6 +42,7 @@ then
     apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     apt install nvidia-container-toolkit
     usermod -aG docker inaimathi
+    newgrp docker
     nvidia-ctk runtime configure
     service docker restart
     curl -o /usr/local/bin/cog -L "https://github.com/replicate/cog/releases/latest/download/cog_$(uname -s)_$(uname -m)"
