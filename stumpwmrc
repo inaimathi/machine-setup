@@ -13,8 +13,6 @@
   (message "Killing caps-lock...")
   (run-shell-command "setxkbmap -layout us -option ctrl:nocaps"))
 
-(defcommand ssh-add () () (run-shell-command "ssh-add"))
-
 (defcommand screenshot () ()
   (let ((name (run-shell-command "echo \"$(mktemp -p ~/pictures/screenshots/ --suffix=.png)\"" t)))
     (message "Screenshotting...")
@@ -24,16 +22,25 @@
 
 (defcommand dunst-server () () (run-shell-command "dunst &"))
 
+(defcommand save-screen () ()
+  (dump-desktop-to-file "/home/inaimathi/desktop.lisp"))
+
+(defcommand load-screen () ()
+  (when (probe-file "/home/inaimathi/desktop.lisp")
+    (restore-from-file "/home/inaimathi/desktop.lisp")))
+
 (message "  Defining keys...")
+
 
 (defcomm (dmenu-run "C-p") (run-shell-command "dmenu_run"))
 (defcomm (log-out "C-q") (run-shell-command "pkill -u \"$USER\""))
 (defcomm (lock-screen "C-l") (run-shell-command "slock"))
 (defcomm (reinit "C-r") (run-commands "reload" "loadrc"))
 (define-key *root-map* (kbd "RET") "exec xterm -bg black -fg white")
-;; (define-key *root-map* (kbd "RET") "exec x-terminal-emulator")
+(define-key *root-map* (kbd "RET") "exec x-terminal-emulator")
 (define-key *root-map* (kbd "SunPrint_Screen") "screenshot")
 (define-key *root-map* (kbd "C-SunPrint_Screen") "screenshot")
+(define-key *root-map* (kbd "Home") "screenshot")
 
 
 ;; (defcommand switch/register-guy-mcguy () ()
@@ -44,4 +51,4 @@
 
 (message "  Running startup functions...")
 
-(run-commands "cap-caps" "ssh-add" "dunst-server")
+(run-commands "cap-caps" "dunst-server")
