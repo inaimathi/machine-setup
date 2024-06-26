@@ -15,7 +15,7 @@ checkpoint()
 
 if [ ! -d checkpoints ]
 then
-   mkdir checkpoints
+    mkdir checkpoints
 fi
 
 if [ ! -f ~/caps2ctrl.map ]
@@ -26,39 +26,40 @@ fi
 
 if [ ! -f checkpoints/001.check ]
 then
-   eval `ssh-agent -s`
-   chmod 400 ~/.ssh/id_rsa
-   ssh-add
-   echo "Running root installation steps..."
-   chmod +x machine-root-setup.sh
-   su -c ./machine-root-setup.sh || sudo ./machine-root-setup.sh
-   touch checkpoints/001.check
+    eval `ssh-agent -s`
+    chmod 400 ~/.ssh/id_rsa
+    ssh-add
+    echo "Running root installation steps..."
+    chmod +x machine-root-setup.sh
+    su -c ./machine-root-setup.sh || sudo ./machine-root-setup.sh
+    touch checkpoints/001.check
 fi
 
 if [ ! -f checkpoints/002.check ]:
 then
-   echo ".bashrc changes..."
-   setxkbmap -layout us -option ctrl:nocaps
-   echo "setxkbmap -layout us -option ctrl:nocaps" >> ~/.bashrc
-   echo 'eval "$(ssh-agent)"' >> ~/.bashrc
-   touch checkpoints/002.check
+    echo ".bashrc changes..."
+    setxkbmap -layout us -option ctrl:nocaps
+    echo "setxkbmap -layout us -option ctrl:nocaps" >> ~/.bashrc
+    echo 'eval "$(ssh-agent)"' >> ~/.bashrc
+    touch checkpoints/002.check
 fi
 
 if [ ! -f checkpoints/003.check ]:
 then
-   echo "Setting up basics..."
-   guix install dmenu dunst rsync htop emacs git mplayer feh make screen acpi
-   guix install gimp inkscape icecat youtube-dl
-   echo "Keeping underlying LISP version of sbcl (installed with stumpwm earlier)..."
-   # echo ")Setting up Lisp..."
-   # guix install sbcl
-   touch checkpoints/003.check
+    echo "Setting up basics..."
+    gpg --homedir ~/.emacs.d/elpa/gnupg --keyserver hkp://keyserver.ubuntu.com  --recv-keys 645357D2883A0966
+    guix install dmenu dunst rsync htop emacs git mplayer feh make screen acpi
+    guix install gimp inkscape icecat youtube-dl
+    echo "Keeping underlying LISP version of sbcl (installed with stumpwm earlier)..."
+    # echo ")Setting up Lisp..."
+    # guix install sbcl
+    touch checkpoints/003.check
 fi
 
 if [ ! -d ~/quicklisp ]
 then
-   curl -O https://beta.quicklisp.org/quicklisp.lisp || wget https://beta.quicklisp.org/quicklisp.lisp
-   sbcl --load quicklisp.lisp --load setup.lisp --eval '(quit)'
+    curl -O https://beta.quicklisp.org/quicklisp.lisp || wget https://beta.quicklisp.org/quicklisp.lisp
+    sbcl --load quicklisp.lisp --load setup.lisp --eval '(quit)'
 fi
 
 if [ ! -f checkpoints/004.check ]
@@ -70,38 +71,37 @@ fi
 
 if [ ! -f checkpoints/005.check ]
 then
-   echo "Setting up Python..."
-   guix install python-setuptools python-pip python-lxml
-   pip install --user requests cssselect flake8 pylint pyflakes black lxml
-   pip3 install --user requests cssselect flake8 pylint pyflakes black lxml selenium
-   touch checkpoints/005.check
+    echo "Setting up Python..."
+    guix install python-setuptools python-pip python-lxml
+    guix install python-requests python-cssselect python-flake8 python-pylint python-pyflakes python-black python-lxml python-selenium
+    touch checkpoints/005.check
 fi
 
 if [ ! -d ~/.emacs.d/mine ]
 then
-   echo "Setting up Emacs..."
-   mkdir -p ~/.emacs.d/mine
-   cp emacs/* ~/.emacs.d/mine/
-   mkdir ~/.emacs.d/elpa
+    echo "Setting up Emacs..."
+    mkdir -p ~/.emacs.d/mine
+    cp emacs/* ~/.emacs.d/mine/
+    mkdir ~/.emacs.d/elpa
 fi
 
 if [ ! -f ~/.emacs ]
 then
-   cp dot-emacs ~/.emacs
+    cp dot-emacs ~/.emacs
 fi
 
 if [ ! -f ~/.stumpwmrc ]
 then
-   echo "Setting up stumpwm..."
-   cp stumpwmrc ~/.stumpwmrc
+    echo "Setting up stumpwm..."
+    cp stumpwmrc ~/.stumpwmrc
 fi
 
 if [ ! -f checkpoints/006.check ]
 then
-   echo "Setting up basic filesystem structure..."
-   mkdir -p ~/pictures/backgrounds
-   mkdir -p ~/pictures/screenshots ~/projects ~/downloads ~/books ~/videos ~/bin
-   touch checkpoints/006.check
+    echo "Setting up basic filesystem structure..."
+    mkdir -p ~/pictures/backgrounds
+    mkdir -p ~/pictures/screenshots ~/projects ~/downloads ~/books ~/videos ~/bin
+    touch checkpoints/006.check
 fi
 
 if [ ! -f checkpoints/007.check ]
