@@ -175,4 +175,14 @@
   (when (and input (color-of input))
     (set-background-color (color-of input))))
 
+(defun load-dotenv (file)
+  (interactive "fPath to .env: ")
+  (with-temp-buffer
+    (insert-file-contents file)
+    (goto-char (point-min))
+    (while (re-search-forward "^\\([^=]+\\)=\\(.*\\)$" nil t)
+      (let ((key (match-string 1))
+            (value (match-string 2)))
+        (setenv key value)))))
+
 (provide 'convenience)

@@ -34,6 +34,19 @@
    (substring (shell-command-to-string "acpi") 0 -1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general utility
+(defun get-api-keys-from (fname)
+  (mapcar
+   (lambda (line)
+     (let ((split (string-split (substring line 7) "=")))
+       (setenv (first split) (second split))))
+   (remove-if
+    #'string-empty-p
+    (string-lines
+     (shell-command-to-string
+      (format "cat %s | grep export | grep API_KEY" fname))))))
+
+(get-api-keys-from "~/.bashrc")
+
 (defun switch-to-minibuffer ()
   "Switch to minibuffer window."
   (interactive)
@@ -44,7 +57,8 @@
 (add-hook
  'before-save-hook
  (lambda (&optional start end)
-   (delete-trailing-whitespace start end)
+   (unless (string-match "\\.md" buffer-file-name) ;; markdown has syntactically significant trailing whitespace -_-
+     (delete-trailing-whitespace start end))
    (when (string-match "\\.py" buffer-file-name)
      (unless (string-match "api.py" buffer-file-name)
        (py-isort-before-save)))))
@@ -82,7 +96,11 @@
 (hooks markdown
        (lambda ()
 	 ;; Fuck you, Markdown mode, you don't get to re-bind tab
+	 (flyspell-mode)
+	 (flyspell-buffer)
 	 (keys (current-local-map)
+	       "C-c ," 'flyspell-goto-next-error
+	       "C-c ." 'flyspell-correct-word-before-point
 	       "<tab>" 'yas/expand)))
 
 (by-ext ("md" "text") markdown-mode)
@@ -90,12 +108,13 @@
 
 ;;;;;;;;;; Python
 (require 'flymake-python-pyflakes)
+(require 'pyvenv)
 (setq flymake-python-pyflake-sexecutable "flake8 --ignore=E501")
 (setq python-shell-interpreter
       (let ((python-v (python-version)))
 	(if (= (car python-v) 3)
 	    "python"
-	  "python3.7")))
+	  "python3")))
 (hooks python
        (lambda ()
 	 (setq autopair-handle-action-fns
@@ -107,7 +126,8 @@
 	 (python-black-on-save-mode)
 	 (flymake-python-pyflakes-load)))
 
-;;;;;;;;;; Typescript
+;;;;;;;;;; Typescript/Javascript
+(by-ext "js" rjsx-mode)
 (setq-default typescript-indent-level 2)
 (by-ext ("tsx") typescript-mode)
 (defun setup-tide-mode ()
@@ -184,8 +204,9 @@
       "C-x t" 'eshell
       "C-x f" 'browse-url-at-point
 
-      "C-+" 'text-scale-increase
-      "C-=" 'text-scale-decrease
+      "C-+" 'default-text-scale-increase
+      "C-=" 'default-text-scale-decrease
+      "C-c =" 'default-text-scale-reset
 
       "C-x <C-left>" 'beginning-of-buffer
       "C-x <left>" 'beginning-of-buffer
@@ -208,6 +229,7 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
+ '(async-shell-command-buffer 'new-buffer)
  '(blog-default-blogger-title "language agnostic")
  '(blog-default-blogger-user 'leo\.zovic@gmail\.com)
  '(conv-color-map
@@ -219,7 +241,7 @@
  '(haskell-mode-hook
    '(turn-on-haskell-indent
      (lambda nil
-       (auto-complete-mode t))) t)
+       (auto-complete-mode t))))
  '(haskell-program-name "cabal repl" t)
  '(htmlize-output-type 'inline-css)
  '(icomplete-mode t)
@@ -234,7 +256,7 @@
  '(menu-bar-mode nil)
  '(org-log-done 'note)
  '(package-selected-packages
-   '(vue-mode company tide typescript-mode flycheck rjsx-mode magit agda2-mode sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab highlight-parentheses aes elfeed))
+   '(default-text-scale vue-mode company tide typescript-mode flycheck rjsx-mode sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab highlight-parentheses aes elfeed))
  '(quack-programs
    '("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))
  '(scheme-program-name "racket")

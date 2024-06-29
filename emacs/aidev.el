@@ -27,6 +27,7 @@
   (interactive "sPrompt: ")
   (let ((prompt
 	 `((("role" . "system") ("content" . "You are an extremely competent programmer. You have an encyclopedic understanding, high-level understanding of all programming languages and understand how to write the most understandeable, elegant code in all of them."))
+	   (("role" . "system") ("content" . "The likeliest requests involve generating code. If you are asked to generate code, only return code, and no commentary. If you must, provide minor points and/or testing examples in the form of code comments (commented in the appropriate syntax) but no longer prose unless explicitly requested."))
 	   (("role" . "system") ("content" . ,(format "The user is currently working in the major mode '%s', so please return code appropriate for that context." major-mode)))
 	   ,@(when (region-active-p)
 	       `((("role" . "user") ("content" . ,(buffer-substring-no-properties (region-beginning) (region-end))))))
@@ -47,7 +48,7 @@
 	  (reg-end (region-end)))
       (goto-char reg-start)
       (delete-region reg-start reg-end)
-      (insert (aidev-first-message-content data)))))
+      (insert data))))
 
 (defun aidev-explain-region ()
   (interactive)
