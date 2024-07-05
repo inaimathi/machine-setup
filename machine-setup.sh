@@ -41,6 +41,7 @@ then
     setxkbmap -layout us -option ctrl:nocaps
     echo "setxkbmap -layout us -option ctrl:nocaps" >> ~/.bashrc
     echo 'eval "$(ssh-agent)"' >> ~/.bashrc
+    echo 'setxkbmap -layout us -option ctrl:nocaps' >> ~/.bashrc
     touch checkpoints/002.check
 fi
 
