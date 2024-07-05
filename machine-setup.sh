@@ -83,6 +83,8 @@ then
     echo "Setting up Emacs..."
     mkdir -p ~/.emacs.d/mine
     cp emacs/* ~/.emacs.d/mine/
+    wget https://raw.githubusercontent.com/jorgenschaefer/pyvenv/master/pyvenv.el
+    mv pyvenv.el ~/.emacs.d/mine/
     mkdir ~/.emacs.d/elpa
 fi
 
