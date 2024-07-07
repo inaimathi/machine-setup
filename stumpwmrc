@@ -31,7 +31,6 @@
 
 (message "  Defining keys...")
 
-
 (defcomm (dmenu-run "C-p") (run-shell-command "dmenu_run"))
 (defcomm (log-out "C-q") (run-shell-command "pkill -u \"$USER\""))
 (defcomm (lock-screen "C-l") (run-shell-command "slock"))
@@ -42,6 +41,8 @@
 (define-key *root-map* (kbd "C-SunPrint_Screen") "screenshot")
 (define-key *root-map* (kbd "Home") "screenshot")
 
+(define-key *resize-map* (kbd "XF86AudioLowerVolume") "resize 0 -10" )
+(define-key *resize-map* (kbd "XF86AudioRaiseVolume") "resize 0 10" )
 
 ;; (defcommand switch/register-guy-mcguy () ()
 ;;   (message "Filling register form...")
