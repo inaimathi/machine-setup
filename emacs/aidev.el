@@ -1,8 +1,29 @@
 (require 'request)
 
+(defun aidev--invert-markdown-code (md-block &optional comment-start comment-end)
+  (let* ((lines (split-string md-block "\n"))
+         (in-code-block nil)
+         (c-start (or comment-start ";; "))
+         (c-end (or comment-end ""))
+         result)
+    (dolist (line lines)
+      (if (string-match-p "^[ \t]*```" line)
+          (setq in-code-block (not in-code-block))
+        (push (if in-code-block
+                  line
+                (concat c-start line c-end))
+              result)))
+    (string-join (nreverse result) "\n")))
+
+(defun aidev--strip-markdown-code (md-block)
+  (replace-regexp-in-string
+   "\\(?:^```[a-zA-Z-]*\\s-*\n\\|\\n?```\\s-*$\\)"
+   ""
+   md-block))
+
 (defun aidev--chat (system messages)
   (let* ((cmd (format
-	       "gpt -s %s %s"
+	       "claude -s %s %s"
 	       (shell-quote-argument system)
 	       (string-join
 		(mapcar
@@ -11,10 +32,7 @@
 		" ")))
          (result (shell-command-to-string cmd)))
     (string-trim
-     (replace-regexp-in-string
-      "\\(?:^```[a-zA-Z-]*\\s-*\n\\|\\n?```\\s-*$\\)"
-      ""
-      result))))
+     (aidev--strip-markdown-code result))))
 
 (defun aidev-insert-chat (prompt)
   (interactive "sPrompt: ")
@@ -52,5 +70,23 @@
       (goto-char reg-start)
       (delete-region reg-start reg-end)
       (insert data))))
+
+(defun aidev-refactor-buffer-with-chat (prompt)
+  "Refactors the current buffer using `aidev--chat` function and a prompt."
+  (interactive "sPrompt: ")
+  (let* ((system (string-join
+                  (list
+                   "You are an extremely competent programmer. You have an encyclopedic understanding, high-level understanding of all programming languages and understand how to write the most understandeable, elegant code in all of them."
+                   (format "The user is currently working in the major mode '%s', so please return code appropriate for that context." major-mode)
+                   "The user wants you to help them refactor a piece of code they've already written. Unless specified by their prompt, you should output code in the same language as the input code. Output absolutely nothing but code; the message you return should be a drop-in replacement for the code the user needs help with.")
+                  "\n"))
+         (prompt `((("role" . "user")
+                    ("content" . ,prompt))
+                   (("role" . "user")
+                    ("content" . ,(buffer-substring-no-properties
+                                   (point-min) (point-max))))))
+         (data (aidev--chat system prompt)))
+    (delete-region (point-min) (point-max))
+    (insert data)))
 
 (provide 'aidev)
