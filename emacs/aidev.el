@@ -89,4 +89,25 @@
     (delete-region (point-min) (point-max))
     (insert data)))
 
+(defun aidev-new-buffer-from-chat (prompt)
+  "Creates a new buffer with the result of a chat request."
+  (interactive "sPrompt: ")
+  (let* ((system
+          (string-join
+           (list
+            "You are an extremely competent programmer. You have an encyclopedic understanding, high-level understanding of all programming languages and understand how to write the most understandeable, elegant code in all of them."
+            "The likeliest requests involve generating code. If you are asked to generate code, only return code, and no commentary. If you must, provide minor points and/or testing examples in the form of code comments (commented in the appropriate syntax) but no longer prose unless explicitly requested."
+            (format "The user is currently working in the major mode '%s', so please return code appropriate for that context." major-mode))
+           "\n"))
+         (messages
+          `(,@(when (use-region-p)
+                `((("role" . "user") ("content" . ,(buffer-substring-no-properties (region-beginning) (region-end))))))
+            (("role" . "user") ("content" . ,prompt))))
+         (result (aidev--chat system messages))
+         (new-buffer (generate-new-buffer "*AI Generated Code*")))
+    (with-current-buffer new-buffer
+      (insert result)
+      (funcall major-mode))
+    (switch-to-buffer new-buffer)))
+
 (provide 'aidev)
