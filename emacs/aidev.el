@@ -35,7 +35,7 @@
              "http://localhost:11434/"))))
 
 (defun aidev---ollama (messages &optional system model)
-  "Send MESSAGES to Ollama API.
+  "Send MESSAGES to Ollama API using the generate endpoint.
 MODEL defaults to \"deepseek-coder-v2:latest\".
 SYSTEM is an optional system prompt."
   (unless aidev---ollama-default-url
@@ -44,26 +44,26 @@ SYSTEM is an optional system prompt."
          (url-request-method "POST")
          (url-request-extra-headers
           '(("Content-Type" . "application/json")))
+         (prompt (format "SYSTEM PROMPT: %s MESSAGES: %s"
+                         (or system "")
+                         (json-encode messages)))
          (url-request-data
           (json-encode
-           `((messages . ,(if system
-                              (cons `((role . "system")
-                                      (content . ,system))
-                                    messages)
-                            messages))
+           `((prompt . ,prompt)
+	     (stream . :json-false)
              (model . ,model))))
          (response-buffer
           (url-retrieve-synchronously
-           (concat aidev---ollama-default-url "/api/chat")))
+           (concat aidev---ollama-default-url "/api/generate")))
          response)
     (unwind-protect
-	(with-current-buffer response-buffer
+        (with-current-buffer response-buffer
           (goto-char (point-min))
           (re-search-forward "^$")
           (forward-char)
           (setq response (json-read)))
       (kill-buffer response-buffer))
-    (cdr (assoc 'content (cdr (assoc 'message response))))))
+    (cdr (assoc 'response response))))
 
 (defun aidev---openai (messages &optional system model)
   "Send MESSAGES to OpenAI API.
