@@ -115,8 +115,8 @@
   (let ((env-address (getenv "AIDEV_OLLAMA_ADDRESS")))
     (or env-address
 	(aidev---ollama-available "http://192.168.0.12:11434/")
-	(aidev---ollama-check-connectivity "http://localhost:11435/")
-	(aidev---ollama-check-connectivity "http://localhost:11434/"))))
+	(aidev---ollama-available "http://localhost:11435/")
+	(aidev---ollama-available "http://localhost:11434/"))))
 
 (defun aidev---ollama (messages &optional system model)
   "Send MESSAGES to Ollama API using the generate endpoint.
