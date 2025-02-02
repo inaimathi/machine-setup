@@ -88,7 +88,7 @@
 (defun aidev--chat (system messages)
   (string-trim (aidev---ollama messages system)))
 
-(defun aidev---ollama-check-connectivity (url)
+(defun aidev---ollama-available (url)
   "Check if there's a listening Ollama server at URL."
   (let* ((parsed-url (url-generic-parse-url url))
          (host (url-host parsed-url))
@@ -108,16 +108,15 @@
                     (setq connected t))))
                (sleep-for 0.2)
                (delete-process proc)
-               connected)
+               (and connected url))
            (error nil)))))
 
 (defvar aidev---ollama-default-url
   (let ((env-address (getenv "AIDEV_OLLAMA_ADDRESS")))
     (or env-address
-	(and (aidev---ollama-check-connectivity "http://192.168.0.12:11434/")
-             "http://192.168.0.12:11434/")
-	(and (aidev---ollama-check-connectivity "http://localhost:11434/")
-             "http://localhost:11434/"))))
+	(aidev---ollama-available "http://192.168.0.12:11434/")
+	(aidev---ollama-check-connectivity "http://localhost:11435/")
+	(aidev---ollama-check-connectivity "http://localhost:11434/"))))
 
 (defun aidev---ollama (messages &optional system model)
   "Send MESSAGES to Ollama API using the generate endpoint.
@@ -150,27 +149,51 @@ SYSTEM is an optional system prompt."
       (kill-buffer response-buffer))
     (cdr (assoc 'response response))))
 
+(defun aidev---decode-utf8-string (str)
+  "Fix misencoded UTF-8 characters in STR.
+Replaces misencoded em-dashes and typographic quotes with standard ASCII equivalents."
+  (let ((result str))
+    ;; Replace misencoded em-dash (â) with hyphen (-)
+    (setq result (replace-regexp-in-string "â" "-" result))
+    ;; Replace misencoded right single quote (â) with a straight apostrophe (')
+    (setq result (replace-regexp-in-string "â" "'" result))
+    ;; Optionally replace misencoded left/right double quotes with standard double quotes:
+    (setq result (replace-regexp-in-string "â" "\"" result))
+    (setq result (replace-regexp-in-string "â" "\"" result))
+    result))
+
+
 (defun aidev---openai (messages &optional system model)
   "Send MESSAGES to OpenAI API.
-MODEL defaults to \"gpt-4-0-latest\".
+MODEL defaults to \"o1-mini\".
 SYSTEM is an optional system prompt."
-  (let* ((model (or model "chatgpt-4o-latest"))
-         (url-request-method "POST")
+  (message "GOT REQ: %s %s" messages system)
+  (let* ((model (or model "o3-mini"))
+	 (system-supported-models '("gpt-3.5-turbo" "gpt-4" "gpt-3.5-turbo-0301"))
          (url-request-extra-headers
           `(("Content-Type" . "application/json")
             ("Authorization" . ,(concat "Bearer " (getenv "OPENAI_API_KEY")))))
+	 (messages-with-system
+          (if system
+              (if (member model system-supported-models)
+                  ;; Model supports system prompts: add as a system message.
+                  (cons `((role . "system")
+                          (content . ,system))
+                        messages)
+                ;; Model does not support system prompts: add as a user message.
+                (cons `((role . "user")
+                        (content . ,(concat "SYSTEM_PROMPT: " system)))
+                      messages))
+            messages))
          (url-request-data
           (json-encode
-           `((messages . ,(if system
-                              (cons `((role . "system")
-                                      (content . ,system))
-                                    messages)
-                            messages))
+           `((messages . ,messages-with-system)
              (model . ,model))))
          (response-buffer
           (url-retrieve-synchronously
            "https://api.openai.com/v1/chat/completions"))
          response)
+    (message "SENT %s" url-request-data)
     (message "GOT RESPONSE")
     (unwind-protect
 	(with-current-buffer response-buffer
@@ -180,7 +203,8 @@ SYSTEM is an optional system prompt."
           (setq response (json-read)))
       (kill-buffer response-buffer))
     (message "RESPONSE: %s" response)
-    (cdr (assoc 'content (cdr (assoc 'message (aref (cdr (assoc 'choices response)) 0)))))))
+    (aidev---decode-utf8-string
+     (cdr (assoc 'content (cdr (assoc 'message (aref (cdr (assoc 'choices response)) 0))))))))
 
 (defun aidev---claude (messages &optional system model)
   "Send MESSAGES to Claude API.
