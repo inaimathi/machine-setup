@@ -40,14 +40,13 @@ then
     echo ".bashrc changes..."
     setxkbmap -layout us -option ctrl:nocaps
     echo "setxkbmap -layout us -option ctrl:nocaps" >> ~/.bashrc
-    echo 'eval "$(ssh-agent)"' >> ~/.bashrc
-    echo 'setxkbmap -layout us -option ctrl:nocaps' >> ~/.bashrc
     touch checkpoints/002.check
 fi
 
 if [ ! -f checkpoints/003.check ]:
 then
     echo "Setting up basics..."
+    mkdir -p ~/.emacs.d/elpa/gnupg
     gpg --homedir ~/.emacs.d/elpa/gnupg --keyserver hkp://keyserver.ubuntu.com  --recv-keys 645357D2883A0966
     guix install dmenu dunst rsync htop emacs git mplayer feh make screen acpi
     guix install gimp inkscape icecat youtube-dl
@@ -85,7 +84,7 @@ then
     cp emacs/* ~/.emacs.d/mine/
     wget https://raw.githubusercontent.com/jorgenschaefer/pyvenv/master/pyvenv.el
     mv pyvenv.el ~/.emacs.d/mine/
-    mkdir ~/.emacs.d/elpa
+    mkdir -p ~/.emacs.d/elpa
 fi
 
 if [ ! -f ~/.emacs ]
@@ -111,7 +110,6 @@ if [ ! -f checkpoints/007.check ]
 then
     echo "Double-check non-root docker stuff..."
     docker run hello-world
-    echo 'newgrp docker' >> ~/.bashrc
     touch checkpoints/007.check
 fi
 
