@@ -48,7 +48,7 @@ then
     echo "Setting up basics..."
     mkdir -p ~/.emacs.d/elpa/gnupg
     gpg --homedir ~/.emacs.d/elpa/gnupg --keyserver hkp://keyserver.ubuntu.com  --recv-keys 645357D2883A0966
-    guix install dmenu dunst rsync htop emacs git mplayer feh make screen acpi
+    guix install dmenu dunst rsync btop kitty emacs git mplayer feh make screen acpi
     guix install gimp inkscape icecat youtube-dl
     echo "Keeping underlying LISP version of sbcl (installed with stumpwm earlier)..."
     # echo ")Setting up Lisp..."
