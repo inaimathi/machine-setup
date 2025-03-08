@@ -6,7 +6,7 @@
   '(aes request
     magit highlight-parentheses auto-complete yasnippet paredit flex-autopair
     rjsx-mode markdown-mode haskell-mode clojure-mode cider sml-mode
-    py-isort flymake-python-pyflakes))
+    py-isort flymake-python-pyflakes abyss-theme))
 
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))

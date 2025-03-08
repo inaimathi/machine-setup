@@ -3,6 +3,11 @@
 (require 'packs)
 (require 'aidev)
 
+(require 'aidev-mode)
+(aidev-global-mode 1)
+
+(custom-set-faces '(default ((t (:height 220)))))
+
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
 (add-to-list 'load-path (expand-file-name "~/.nix-profile/share/emacs/site-lisp"))
@@ -237,7 +242,7 @@
      ("env-metastore" . "LightGreen")
      ("env-pytrade" . "LightGoldenrod4")
      ("env-dupe-detection" . "LightBlue2")))
- '(custom-enabled-themes '(whiteboard))
+ '(custom-enabled-themes '(abyss))
  '(haskell-mode-hook
    '(turn-on-haskell-indent
      (lambda nil
