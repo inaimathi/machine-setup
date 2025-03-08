@@ -65,7 +65,10 @@ fi
 if [ ! -f checkpoints/004.check ]
 then
     echo "Setting up languages..."
-    guix install ghc ocaml polyml
+    guix install ghc ocaml polyml node
+    echo "export PATH=~/.npm-global/bin:$PATH" >> ~/.bashrc
+    mkdir ~/.npm-global
+    npm install -g --prefix ~/.npm-global yarn
     touch checkpoints/004.check
 fi
 
