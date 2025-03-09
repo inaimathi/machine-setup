@@ -1,0 +1,19 @@
+[global_config]
+  focus = mouse
+  window_state = maximise
+  borderless = True
+  hide_from_taskbar = True
+[keybindings]
+[profiles]
+  [[default]]
+    hide_tabbar = True
+    show_titlebar = False
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+[plugins]

@@ -48,12 +48,21 @@ then
     echo "Setting up basics..."
     mkdir -p ~/.emacs.d/elpa/gnupg
     gpg --homedir ~/.emacs.d/elpa/gnupg --keyserver hkp://keyserver.ubuntu.com  --recv-keys 645357D2883A0966
-    guix install dmenu dunst rsync btop kitty emacs git mplayer feh make screen acpi obs
-    guix install gimp inkscape icecat youtube-dl
+    guix pull
+    guix install dmenu dunst rsync btop terminator emacs git mplayer feh make screen acpi obs
+    guix install gimp inkscape youtube-dl
     echo "Keeping underlying LISP version of sbcl (installed with stumpwm earlier)..."
     # echo ")Setting up Lisp..."
     # guix install sbcl
     touch checkpoints/003.check
+fi
+
+if [ ! -f checkpoints/003.5.check ]:
+then
+    guix install terminator
+    mkdir -p ~/.config
+    cp -r ./terminator ~/.config/
+    touch checkpoints/003.5.check
 fi
 
 if [ ! -d ~/quicklisp ]

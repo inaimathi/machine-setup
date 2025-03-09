@@ -36,7 +36,7 @@
 (defcomm (lock-screen "C-l") (run-shell-command "slock"))
 (defcomm (reinit "C-r") (run-commands "reload" "loadrc"))
 ;; (define-key *root-map* (kbd "RET") "exec xterm -bg black -fg white")
-(define-key *root-map* (kbd "RET") "exec kitty")
+(define-key *root-map* (kbd "RET") "exec terminator")
 (define-key *root-map* (kbd "SunPrint_Screen") "screenshot")
 (define-key *root-map* (kbd "C-SunPrint_Screen") "screenshot")
 (define-key *root-map* (kbd "Home") "screenshot")
