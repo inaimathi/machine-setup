@@ -5,8 +5,8 @@
 (defvar +package-list+
   '(aes request
     magit highlight-parentheses auto-complete yasnippet paredit flex-autopair
-    rjsx-mode markdown-mode haskell-mode clojure-mode cider sml-mode
-    py-isort flymake-python-pyflakes abyss-theme))
+    rjsx-mode markdown-mode haskell-mode clojure-mode cider sml-mode scad-mode
+    py-isort flymake-python-pyflakes python-black abyss-theme))
 
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
