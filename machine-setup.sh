@@ -49,7 +49,9 @@ then
     mkdir -p ~/.emacs.d/elpa/gnupg
     gpg --homedir ~/.emacs.d/elpa/gnupg --keyserver hkp://keyserver.ubuntu.com  --recv-keys 645357D2883A0966
     guix pull
-    guix install dmenu dunst rsync btop terminator emacs git mplayer feh make screen acpi obs openscad
+    guix install dmenu dunst rsync btop terminator emacs git gcal mplayer feh make screen acpi obs openscad pandoc
+    guix install nss-certs
+    guix install rust rust-cc rust-cargo
     guix install gimp inkscape youtube-dl
     echo "Keeping underlying LISP version of sbcl (installed with stumpwm earlier)..."
     # echo ")Setting up Lisp..."

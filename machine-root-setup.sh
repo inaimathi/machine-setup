@@ -3,7 +3,7 @@ set -e
 if [ ! -f checkpoints/001-root.check ]
 then
    echo "   Installing window-managment basics..."
-   apt-get install stumpwm
+   apt install stumpwm
    touch checkpoints/001-root.check
 fi
 
@@ -18,7 +18,7 @@ fi
 if [ ! -f checkpoints/003-root.check ]
 then
    echo "   Installing basics that don't work out of guix..."
-   apt-get install pmount pacpl mtp-tools libblas-dev liblapack-dev gnupg gnupg-agent python3-pip slock pavucontrol curl
+   apt install pmount pacpl mtp-tools libblas-dev liblapack-dev gnupg gnupg-agent python3-pip slock pavucontrol curl pkg-config libssl-dev
    touch checkpoints/003-root.check
 fi
 
