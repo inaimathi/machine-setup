@@ -1,12 +1,21 @@
 (add-to-list 'load-path (concat user-emacs-directory "mine"))
+(add-to-list 'load-path "~/projects/aidev-mode")
 (require 'convenience)
 (require 'packs)
-(require 'aidev)
-
 (require 'aidev-mode)
 (aidev-global-mode 1)
 
-(custom-set-faces '(default ((t (:height 220)))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:height 120))))
+ '(git-commit-nonempty-second-line-face ((t (:inherit nil))))
+ '(git-commit-overlong-summary-face ((t (:inherit nil))))
+ '(git-commit-summary-face ((t (:inherit nil)))))
+
+(setq package-install-upgrade-built-in t)
 
 (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
 (setq haskell-program-name "ghci-7.8.4")
@@ -131,6 +140,45 @@
 	 (python-black-on-save-mode)
 	 (flymake-python-pyflakes-load)))
 
+(defun run-python-with (venv-path)
+  "Start a Python REPL using the specified virtualenv.
+VENV-PATH should be the path to the virtualenv directory."
+  (interactive "DSelect virtualenv directory: ")
+  (let* ((venv-name (file-name-nondirectory (directory-file-name venv-path)))
+         (python-executable (expand-file-name "bin/python" venv-path))
+         (buffer-name (format "*Python-%s*" venv-name))
+         (python-shell-interpreter python-executable)
+         (python-shell-buffer-name buffer-name))
+
+    ;; Check if the Python executable exists
+    (unless (file-executable-p python-executable)
+      (error "Python executable not found at %s" python-executable))
+
+    ;; Check if a REPL with this name already exists
+    (when (get-buffer buffer-name)
+      (if (yes-or-no-p (format "Buffer %s already exists. Kill it and start new? " buffer-name))
+          (kill-buffer buffer-name)
+        (error "Aborted")))
+
+    ;; Temporarily activate the virtualenv for pyvenv integration
+    (let ((original-venv pyvenv-virtual-env))
+      (pyvenv-activate venv-path)
+
+      ;; Start the Python REPL
+      (run-python python-executable nil t)
+
+      ;; Rename the buffer to our custom name
+      (with-current-buffer (python-shell-get-buffer)
+        (rename-buffer buffer-name))
+
+      ;; Restore original virtualenv if there was one
+      (if original-venv
+          (pyvenv-activate original-venv)
+        (pyvenv-deactivate)))
+
+    ;; Switch to the new REPL buffer
+    (pop-to-buffer buffer-name)))
+
 ;;;;;;;;;; Typescript/Javascript
 (by-ext "js" rjsx-mode)
 (setq-default typescript-indent-level 2)
@@ -230,13 +278,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(aidev-global-mode t)
+ '(aidev-provider 'ollama)
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
  '(async-shell-command-buffer 'new-buffer)
  '(blog-default-blogger-title "language agnostic")
- '(blog-default-blogger-user 'leo\.zovic@gmail\.com)
+ '(blog-default-blogger-user 'leo.zovic@gmail.com)
  '(conv-color-map
    '(("env-pageclass" . "LightSalmon")
      ("env-metastore" . "LightGreen")
@@ -257,11 +307,12 @@
      ("yarv" . "irb1.9 -r irb/completion")
      ("macruby" . "macirb -r irb/completion")
      ("pry" . "pry")))
+ '(lean4-rootdir "~/.elan")
  '(lpr-command "lp")
  '(menu-bar-mode nil)
  '(org-log-done 'note)
  '(package-selected-packages
-   '(default-text-scale vue-mode company tide typescript-mode flycheck rjsx-mode sesman pyvenv dot-mode python-black slack pyenv-mode yaml-mode flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab highlight-parentheses aes elfeed))
+   '(dash lsp-mode magit-section gptel package-lint scad-mode aidev-mode abyss-theme seq default-text-scale vue-mode company tide typescript-mode flycheck rjsx-mode sesman pyvenv dot-mode python-black pyenv-mode yaml-mode flycheck-pycheckers jedi flymake-python-pyflakes python-pylint cider clojure-mode haskell-mode markdown-mode paredit yasnippet auto-complete smart-tab highlight-parentheses aes elfeed))
  '(quack-programs
    '("racket" "bigloo" "cis" "csi" "csi -hygienic" "gosh" "gsi" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M errortrace" "mzscheme -il r6rs" "mzscheme -il typed-scheme" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))
  '(scheme-program-name "racket")
@@ -272,14 +323,7 @@
  '(tramp-inline-compress-start-size 1000000)
  '(transient-mark-mode t))
 (put 'downcase-region 'disabled nil)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(git-commit-nonempty-second-line-face ((t (:inherit nil))))
- '(git-commit-overlong-summary-face ((t (:inherit nil))))
- '(git-commit-summary-face ((t (:inherit nil)))))
+
 
 (put 'upcase-region 'disabled nil)
 
