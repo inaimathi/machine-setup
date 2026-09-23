@@ -36,14 +36,15 @@
 (defcomm (lock-screen "C-l") (run-shell-command "slock"))
 (defcomm (reinit "C-r") (run-commands "reload" "loadrc"))
 ;; (define-key *root-map* (kbd "RET") "exec xterm -bg black -fg white")
-(define-key *root-map* (kbd "RET") "exec terminator")
+;; (define-key *root-map* (kbd "RET") "exec x-terminal-emulator")
+(define-key *root-map* (kbd "RET") "exec terminator -u")
 (define-key *root-map* (kbd "SunPrint_Screen") "screenshot")
 (define-key *root-map* (kbd "C-SunPrint_Screen") "screenshot")
 (define-key *root-map* (kbd "Home") "screenshot")
 (define-key *root-map* (kbd "C-f") "fullscreen")
 
-(define-key *resize-map* (kbd "XF86AudioLowerVolume") "resize 0 -10" )
-(define-key *resize-map* (kbd "XF86AudioRaiseVolume") "resize 0 10" )
+;; (define-key *resize-map* (kbd "XF86AudioLowerVolume") "resize 0 -10" )
+;; (define-key *resize-map* (kbd "XF86AudioRaiseVolume") "resize 0 10" )
 
 ;; (defcommand switch/register-guy-mcguy () ()
 ;;   (message "Filling register form...")
@@ -54,3 +55,76 @@
 (message "  Running startup functions...")
 
 (run-commands "cap-caps" "dunst-server")
+
+
+;;;;;;;;;; Frame locking
+(defvar *frame-locks* nil
+  "Alist of (frame . window). A locked frame refuses to display any other window.")
+(defparameter *frame-lock-color* "Red")
+
+(defun frame-lock (frame) (cdr (assoc frame *frame-locks*)))
+
+(defun frame-lock-blocks-p (frame win)
+  "True if showing WIN in FRAME would violate a lock, either because FRAME is
+pinned to another window or because WIN is pinned to a different frame."
+  (let ((pinned (frame-lock frame))
+        (home (car (rassoc win *frame-locks*))))
+    (or (and pinned (not (eq pinned win)))
+        (and home (not (eq home frame))))))
+
+;; Wrap the two choke points. Unencapsulate first so `loadrc` doesn't stack wrappers.
+(sb-int:unencapsulate 'pull-window 'frame-lock)
+(sb-int:encapsulate
+ 'pull-window 'frame-lock
+ (lambda (orig win &rest args)
+   (let ((to-frame (or (first args) (tile-group-current-frame (window-group win)))))
+     (if (frame-lock-blocks-p to-frame win)
+	 (message "^1Frame is locked")
+	 (apply orig win args)))))
+
+(sb-int:unencapsulate
+ 'frame-raise-window 'frame-lock)
+(sb-int:encapsulate
+ 'frame-raise-window 'frame-lock
+ (lambda (orig group frame win &rest args)
+   (if (and win (frame-lock-blocks-p frame win))
+       (message "^1Frame is locked")
+       (apply orig group frame win args))))
+
+;; Keep the border colored even after focus changes redraw it.
+(defmethod update-decoration :after ((win tile-window))
+  (when (rassoc win *frame-locks*)
+    (setf (xlib:window-border (window-parent win))
+          (alloc-color (window-screen win) *frame-lock-color*))))
+
+;; Safety net: if a new window gets placed straight into a locked frame,
+;; put the pinned window back on top (without stealing focus).
+(defun frame-lock-enforce (&rest ignore)
+  (declare (ignore ignore))
+  (loop for (frame . win) in *frame-locks*
+        unless (eq (frame-window frame) win)
+          do (frame-raise-window (window-group win) frame win nil)))
+
+;; If the pinned window dies, drop the lock.
+(defun frame-lock-cleanup (win)
+  (setf *frame-locks* (remove win *frame-locks* :key #'cdr)))
+
+(add-hook *new-window-hook* 'frame-lock-enforce)
+(add-hook *destroy-window-hook* 'frame-lock-cleanup)
+
+(defcommand toggle-frame-lock () ()
+  (let* ((group (current-group))
+         (frame (and (typep group 'tile-group) (tile-group-current-frame group)))
+         (win (and frame (frame-window frame))))
+    (cond ((null frame) (message "Not in a tiling group"))
+          ((frame-lock frame)
+           (let ((w (frame-lock frame)))
+             (setf *frame-locks* (remove frame *frame-locks* :key #'car))
+             (update-decoration w)
+             (message "Frame unlocked")))
+          ((null win) (message "No window in this frame to lock"))
+          (t (push (cons frame win) *frame-locks*)
+             (update-decoration win)
+             (message "Frame locked to ~a" (window-name win))))))
+
+(define-key *root-map* (kbd "L") "toggle-frame-lock")
